@@ -1,0 +1,11 @@
+# Testing
+test*
+temp.py
+notes.txt
+testing/*
+
+# Data
+views/*
+combined/*
+tables/*
+__pycache__/*
