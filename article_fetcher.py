@@ -21,15 +21,13 @@ headers = {"User-Agent": "JPxG's hoopty script (https://en.wikipedia.org/wiki/Us
 # This is a secret tool that will come in handy later.
 signpost = "Wikipedia Signpost"
 
-def fetch(year_start=int(datetime.datetime.now().year), year_end=int(datetime.datetime.now().year), month_range=13, days=180, format="dict"):
+def fetch(year_start=int(datetime.datetime.now().year), year_end=int(datetime.datetime.now().year), month_range=13, format="dict"):
   page_list_array = []
   # All of the queries to send to the server and get a PrefixIndex-like list. Not returned.
   articles_array = []
   # Simple array of the pages, as they come from PrefixIndex.
   all_articles = {}
   # Formatted dict of all the pages, as they are in Module:Signpost.
-
-  views_no = "views" + str(days).zfill(3)
 
   for year in range(year_start, (year_end + 1)):
     all_articles[str(year)] = []
@@ -80,7 +78,6 @@ def fetch(year_start=int(datetime.datetime.now().year), year_end=int(datetime.da
     little_dict = {}
     little_dict["date"]    = issue_date
     little_dict["subpage"] = article_dept
-    little_dict[views_no]   = -1
     if article_dept != "":
       all_articles[issue_y].append(little_dict)
 
