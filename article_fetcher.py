@@ -78,7 +78,10 @@ def fetch(year_start=int(datetime.datetime.now().year), year_end=int(datetime.da
     little_dict = {}
     little_dict["date"]    = issue_date
     little_dict["subpage"] = article_dept
-    if article_dept != "":
+    if (article_dept != "") and (article_dept != "SPV"):
+      # No subpage name means it's the main page for that issue.
+      # "SPV" is the old (2006esque) way that single issues were compiled
+      #     (new ones are Wikipedia Signpost/Single/YYYY-MM-DD).
       all_articles[issue_y].append(little_dict)
 
   """
