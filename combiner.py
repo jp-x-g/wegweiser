@@ -29,7 +29,7 @@ def updateArray(baseArray, updateArray):
         key = (item['date'], item['subpage'])
         updateDict[key] = item
 
-    print(baseDict)
+    #print(baseDict)
     
     for i in range(len(updateArray)):
         key = (updateArray[i]['date'], updateArray[i]['subpage'])
@@ -42,7 +42,8 @@ def updateArray(baseArray, updateArray):
 # Let's figure out some of our parameters, read args, and wrangle some Lua.
 ###############################################################################
 
-combine_views = False
+combine_views = True
+#combine_views = False
 current_year  = int(datetime.datetime.now().year)
 combine_year  = current_year
 
@@ -73,15 +74,18 @@ all_articles = article_fetcher.fetch(combine_year, combine_year, 13, format="dic
 
 all_articles = all_articles[str(combine_year)]
 
-print(f"Fetched PrefixIndex article list..... Items: {len(lua_json)}")
+print(f"Fetched PrefixIndex article list..... Items: {len(all_articles)}")
 
 lua_json = updateArray(lua_json, all_articles)
 
-print(lua_json)
+# print(lua_json)
 
 
 
-
+if combine_year < 2015:
+  print("Skipping pageview statistics (year is before May 2015)")
+  # Pageview statistics only exist for May 2015 and later.
+  combine_views = False
 
 ###############################################################################
 # Below is the part that integrates viewcounts.
@@ -95,10 +99,25 @@ if combine_views == True:
 
   file_path = "views/" + str(combine_year) + "-views.txt"
   f = open(file_path, "r")
-  fdata = f.read()
+  views_data = f.read()
   f.close()
-  fdata = json.loads(fdata)
-  
+  views_data = json.loads(views_data)
+
+  # Load as JSON.
+  views_data = views_data[str(combine_year)]
+  # Get fdata["2017"] or whatever.
+
+  for index in range(0, len(lua_json)):
+    for my_item in views_data:
+      if (my_item["date"] == lua_json[index]["date"]) and (my_item["subpage"] == lua_json[index]["subpage"]):
+        lua_json[index]["views"] = my_item["views"]
+        #print(lua_json[index])
+        break
+
+
+
+  """
+  Old version, with keys like "views007", "views015", etc.
   for day_range in [7, 30, 60, 90, 120, 180]:
     views_day = "views" + str(day_range).zfill(3)
     fdata = fdata[str(combine_year)]
@@ -107,9 +126,10 @@ if combine_views == True:
       for my_item in fdata:
         if (my_item["date"] == lua_json[index]["date"]) and (my_item["subpage"] == lua_json[index]["subpage"]):
           lua_json[index][views_day] = my_item[views_day]
-          print(lua_json[index])
+          #print(lua_json[index])
           break
     print("Views integrated.")
+  """
 
 
 #TODO: whatever
@@ -126,9 +146,12 @@ output = str(lua_json)
 # Now for the truly hoopty nonsense.
 
 outputtwo = luadata.serialize(lua_json, encoding="utf-8", indent="\t", indent_level=1)
+outputtwo = "return " + outputtwo
 
-print(outputtwo)
+#print(outputtwo)
 
 h = open("combined/combinelua-" + str(combine_year) + ".txt", "w")
 h.write(str(outputtwo))
 h.close()
+
+print("Success: combined/combine-" + str(combine_year) + ".json and combined/combinelua-" + str(combine_year) + ".txt")

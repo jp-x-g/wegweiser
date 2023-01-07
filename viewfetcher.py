@@ -14,7 +14,6 @@ import article_fetcher
 # python3 viewfetcher.py
 # (returns for current year)
 
-
 headers = {"User-Agent": "JPxG's hoopty script (https://en.wikipedia.org/wiki/User:JPxG)"}
 
 # This is a secret tool that will come in handy later.
@@ -47,18 +46,11 @@ views_no = "views" + str(days).zfill(3)
 
 def extract_views(jsonners):
   jsonners = jsonners["items"]
-  views = {
-  "views007": 0,
-  "views015": 0,
-  "views030": 0,
-  "views060": 0,
-  "views090": 0,
-  "views120": 0,
-  "views180": 0,
-  }
+  views = {}
   for the_range in [7, 15, 30, 60, 90, 120, 180]:
-    view_no = "views" + str(the_range).zfill(3)
-    # 7 becomes "views007"
+    view_no = str(the_range).zfill(3)
+    # 7 becomes "007"
+    views[view_no] = -1
     if len(jsonners) < the_range:
       the_range = len(jsonners)
       # If the JSON only has 177 items, then just go to that.
@@ -114,8 +106,7 @@ for year in all_articles:
       data = response.json()
       pageviews = extract_views(data)
       print(f"Retrieved pageviews for {article['date']}/{article['subpage']}: {pageviews}")
-      for key in pageviews:
-        article[key] = int(pageviews[key])
+      article["views"] = pageviews
     else:
       print(f"ERROR getting views for {article['date']}/{article['subpage']}")
       
