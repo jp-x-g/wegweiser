@@ -9,3 +9,7 @@ views/*
 combined/*
 tables/*
 __pycache__/*
+
+# Config
+cfg/*
+cfg/login.txt
