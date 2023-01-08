@@ -11,6 +11,8 @@ import lua_wrangler
 import article_fetcher
 # Usage: python3 combiner.py 2016
 
+headers = {"User-Agent": "JPxG's hoopty script (https://en.wikipedia.org/wiki/User:JPxG)"}
+
 def updateArray(baseArray, updateArray):
     """
     baseArray is the one you want to update, using entries from updateArray.
@@ -148,6 +150,14 @@ output = str(lua_json)
 outputtwo = luadata.serialize(lua_json, encoding="utf-8", indent="\t", indent_level=1)
 outputtwo = "return " + outputtwo
 
+# Make the sub-lists for tags be on one line instead of indented quadrice on multiple lines.
+outputtwo = outputtwo.replace('\n\t\t\t\t"', ' "')
+# Replace "tab tab {" with "tab {"
+outputtwo = outputtwo.replace("\n\t\t{", "\n\t{")
+# Replace "tab tab tab }" for sub-lists with normal closing brace.
+outputtwo = outputtwo.replace("\n\t\t\t}", " }")
+# De-indent individual items in 
+outputtwo = outputtwo.replace("\n\t\t\t", "\n\t\t")
 #print(outputtwo)
 
 h = open("combined/combinelua-" + str(combine_year) + ".txt", "w")
