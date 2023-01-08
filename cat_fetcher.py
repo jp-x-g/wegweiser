@@ -9,6 +9,8 @@ import sys
 # These ones are from the same directory.
 import lua_wrangler
 import article_fetcher
+import weg_ver
+
 
 # namespaces = {
 # "0":     "",
@@ -44,9 +46,9 @@ import article_fetcher
 # }
 # Not necessary.
 
-headers = {"User-Agent": "JPxG's hoopty script (https://en.wikipedia.org/wiki/User:JPxG)"}
 
 def fetch(cat, complete=False):
+  headers = weg_ver.headers()
   cat_list = []
   cat_name = urllib.parse.quote(cat, safe='') 
   url = f"https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:{cat_name}&cmlimit=500&format=json"

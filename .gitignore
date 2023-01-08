@@ -8,6 +8,7 @@ testing/*
 views/*
 combined/*
 tables/*
+metadata/*
 __pycache__/*
 
 # Config

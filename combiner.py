@@ -9,9 +9,9 @@ import sys
 # These ones are from the same directory.
 import lua_wrangler
 import article_fetcher
+import weg_ver
+headers = weg_ver.headers()
 # Usage: python3 combiner.py 2016
-
-headers = {"User-Agent": "JPxG's hoopty script (https://en.wikipedia.org/wiki/User:JPxG)"}
 
 def updateArray(baseArray, updateArray):
     """
@@ -40,14 +40,50 @@ def updateArray(baseArray, updateArray):
             baseArray.append(updateDict[key])
     return baseArray
 
+def updateArrayItems(baseArray, updateArray):
+    """
+    This will update keys in array items, rather than the items themselves.
+    For example, if you want to fill in missing "title" fields for articles,
+    or "author" fields or whatever -- but NOT if the destination array already
+    has those fields. If they've been filled in manually, we leave them alone.
+    """
+    for i in range(len(baseArray)):
+      #print(i)
+      #print(baseArray[i])
+      # For every entry in the base array...
+      for j in range(len(updateArray)):
+        #print(j)
+        #print(updateArray[j])
+        # Go over every entry in the updating array.
+        if (baseArray[i]["date"] == updateArray[j]["date"]) and (baseArray[i]["subpage"] == updateArray[j]["subpage"]):
+          print(baseArray[i])
+          print(updateArray[j])
+          print("Match!")
+          # And if it matches the entry in the base array...
+          for key in updateArray[j]:
+            # Go through every key in the updating array....
+            if key not in (baseArray[i]) or (baseArray[i][key] == "unparsed") or (baseArray[i][key] == ["unparsed"]):
+              # and add the key/value to baseArray... if it doesn't already exist.
+              if updateArray[j][key] != "unparsed":
+                #Unless it's "unparsed".
+                baseArray[i][key] = updateArray[j][key]
+            if key in baseArray[i]:
+              # But if there's already something for that key, don't do anything.
+              pass
+          break
+          # No need to keep going over the update array if you already found the match.
+    return baseArray
+
 ###############################################################################
 # Let's figure out some of our parameters, read args, and wrangle some Lua.
 ###############################################################################
 
-combine_views = True
-#combine_views = False
-current_year  = int(datetime.datetime.now().year)
-combine_year  = current_year
+output_json     = False
+combine_views   = True
+#combine_views   = False
+current_year    = int(datetime.datetime.now().year)
+combine_year    = current_year
+update_metadata = True
 
 if len(sys.argv) > 1:
   combine_year = int(sys.argv[1])
@@ -80,14 +116,21 @@ print(f"Fetched PrefixIndex article list..... Items: {len(all_articles)}")
 
 lua_json = updateArray(lua_json, all_articles)
 
-# print(lua_json)
+###############################################################################
+# Below is the part that integrates metadata (authors, titles, etc).
+###############################################################################
 
+if update_metadata == True:
 
+  file_path = "metadata/" + str(combine_year) + "-metadata.txt"
+  f = open(file_path, "r")
+  meta_data = f.read()
+  f.close()
+  meta_data = json.loads(meta_data)
+  meta_data = meta_data[str(combine_year)]
+  
+  lua_json = updateArrayItems(lua_json, meta_data)
 
-if combine_year < 2015:
-  print("Skipping pageview statistics (year is before May 2015)")
-  # Pageview statistics only exist for May 2015 and later.
-  combine_views = False
 
 ###############################################################################
 # Below is the part that integrates viewcounts.
@@ -97,6 +140,11 @@ if combine_year < 2015:
 # out JSON is canonically "more correct" i.e. the view counts which may change
 # over time. It shouldn't be used for stuff where the Lua may be more correct.
 
+if combine_year < 2015:
+  print("Skipping pageview statistics (year is before May 2015)")
+  # Pageview statistics only exist for May 2015 and later.
+  combine_views = False
+
 if combine_views == True:
 
   file_path = "views/" + str(combine_year) + "-views.txt"
@@ -104,14 +152,24 @@ if combine_views == True:
   views_data = f.read()
   f.close()
   views_data = json.loads(views_data)
-
   # Load as JSON.
   views_data = views_data[str(combine_year)]
-  # Get fdata["2017"] or whatever.
+  # Get views_data["2017"] or whatever.
 
   for index in range(0, len(lua_json)):
     for my_item in views_data:
       if (my_item["date"] == lua_json[index]["date"]) and (my_item["subpage"] == lua_json[index]["subpage"]):
+        if "views" not in my_item:
+          print(f"ERROR: No views for {str(my_item)}")
+          my_item["views"] = {
+          'd007': -1,
+          'd015': -1,
+          'd030': -1,
+          'd060': -1,
+          'd090': -1,
+          'd120': -1,
+          'd180': -1
+          }
         lua_json[index]["views"] = my_item["views"]
         #print(lua_json[index])
         break
@@ -140,9 +198,10 @@ if combine_views == True:
 
 # print(lua_json)
 
-g = open("combined/combine-" + str(combine_year) + ".json", "w")
-g.write(json.dumps(lua_json, indent=2))
-g.close()
+if output_json == True:
+  g = open("combined/combine-" + str(combine_year) + ".json", "w")
+  g.write(json.dumps(lua_json, indent=2))
+  g.close()
 
 output = str(lua_json)
 # Now for the truly hoopty nonsense.
@@ -160,8 +219,10 @@ outputtwo = outputtwo.replace("\n\t\t\t}", " }")
 outputtwo = outputtwo.replace("\n\t\t\t", "\n\t\t")
 #print(outputtwo)
 
-h = open("combined/combinelua-" + str(combine_year) + ".txt", "w")
+h = open("combined/lua-" + str(combine_year) + ".txt", "w")
 h.write(str(outputtwo))
 h.close()
-
-print("Success: combined/combine-" + str(combine_year) + ".json and combined/combinelua-" + str(combine_year) + ".txt")
+if output_json == True:
+  print("Success: combined/combine-" + str(combine_year) + ".json and combined/lua-" + str(combine_year) + ".txt")
+else:
+  print("Success: combined/lua-" + str(combine_year) + ".txt")

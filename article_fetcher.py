@@ -5,6 +5,7 @@ import json
 import urllib
 import luadata
 import sys
+import weg_ver
 # python -m pip install --upgrade luadata
 
 # Normal usage looks like:
@@ -15,13 +16,11 @@ import sys
 # python3 viewfetcher.py
 # (returns for current year)
 
-
-headers = {"User-Agent": "JPxG's hoopty script (https://en.wikipedia.org/wiki/User:JPxG)"}
-
 # This is a secret tool that will come in handy later.
 signpost = "Wikipedia Signpost"
 
 def fetch(year_start=int(datetime.datetime.now().year), year_end=int(datetime.datetime.now().year), month_range=13, format="dict"):
+  headers = weg_ver.headers()
   page_list_array = []
   # All of the queries to send to the server and get a PrefixIndex-like list. Not returned.
   articles_array = []
