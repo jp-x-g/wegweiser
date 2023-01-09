@@ -91,44 +91,67 @@ for year in all_articles:
       titles = soup.find_all(id="signpost-article-title")
       #print(titles)
       for i in titles: 
-        if i.has_key("data-signpost-article-title"):
-          article["title"] = i["data-signpost-article-title"]
-          print(f"Title: {article['title']}")
+        try:
+          if i.has_key("data-signpost-article-title"):
+            # 2017 to present (2023)
+            article["title"] = i["data-signpost-article-title"]
+            print(f"Title: {article['title']}")
+          else:
+            # February 2017 and before.
+            article["title"] = i.text
+            print(f"Title: {article['title']}")
+        except Exception as err:
+          print(f"Title error: {err}")
+
       ########################################
       # Attempt to find the authors. Tricky!
       ########################################
       authors = soup.find_all(id="signpost-article-authors")
-      if len(authors) > 0:
-        authors = authors[0].text
-        # "By Tom, Dick, and Harry"
-        # "By Tom, Dick and Harry"
-        # "By Tom, Dick & Harry"
-        if authors[:3] == "By ":
-          authors = authors[3:]
-        # "Tom, Dick, and Harry"
-        # "Tom, Dick and Harry"
-        authors = authors.replace(" & ", ", ")
-        # Consider having a username without ampersands in it.
-        authors = authors.replace(", and", ", ")
-        authors = authors.replace(" and ", ", ")
-        # "Tom, Dick, Harry"
-        authors = authors.split(", ")
-        # ["Tom", "Dick", "Harry"]
-        for i in range(0, len(authors)):
-          if authors[i] == "":
-            authors[i] = "none"
-          else:
-            # Clean out trailing spaces and gobbledygook.
-            authors[i] = authors[i].replace("  ", " ")
-            if authors[i][0] == " ":
-              authors[i] = authors[i][1:]
-            if authors[i][-1] == " ":
-              authors[i] = authors[i][:-1]
-            if authors[i][-1] == ".":
-              authors[i] = authors[i][:-1]
+      # Post-2017 author code.
+      #print(f"all authors: {authors}")
+      try:
+        if len(authors) > 0:
+          authors = authors[0].text
+        else:
+          # For pre-2017-02-27 issues, where it was "signpost-author"
+          authors = soup.find_all(class_="signpost-author")
+          authors = authors[0].text
+      except Exception as err:
+        print(f"Author error: {err}")
+        authors = "none"
 
-        article["authors"] = authors
-        print(f"Authors: {str(authors)}")
+      # At this point, if there are any authors at all...
+      # the string will look like one of these:
+
+      # "By Tom, Dick, and Harry"
+      # "By Tom, Dick and Harry"
+      # "By Tom, Dick & Harry"
+      if authors[:3] == "By ":
+        authors = authors[3:]
+      # "Tom, Dick, and Harry"
+      # "Tom, Dick and Harry"
+      authors = authors.replace(" & ", ", ")
+      # Consider having a username without ampersands in it.
+      authors = authors.replace(", and", ", ")
+      authors = authors.replace(" and ", ", ")
+      # "Tom, Dick, Harry"
+      authors = authors.split(", ")
+      # ["Tom", "Dick", "Harry"]
+      for i in range(0, len(authors)):
+        if authors[i] == "":
+          authors[i] = "none"
+        else:
+          # Clean out trailing spaces and gobbledygook.
+          authors[i] = authors[i].replace("  ", " ")
+          if authors[i][0] == " ":
+            authors[i] = authors[i][1:]
+          if authors[i][-1] == " ":
+            authors[i] = authors[i][:-1]
+          if authors[i][-1] == ".":
+            authors[i] = authors[i][:-1]
+      article["authors"] = authors
+      print(f"Authors: {str(authors)}")
+
 
       
 
