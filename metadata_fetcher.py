@@ -91,7 +91,7 @@ for year in all_articles:
       titles = soup.find_all(id="signpost-article-title")
       #print(titles)
       for i in titles: 
-        if "data-signpost-article-title" in i:
+        if i.has_key("data-signpost-article-title"):
           article["title"] = i["data-signpost-article-title"]
           print(f"Title: {article['title']}")
       ########################################
@@ -102,15 +102,31 @@ for year in all_articles:
         authors = authors[0].text
         # "By Tom, Dick, and Harry"
         # "By Tom, Dick and Harry"
+        # "By Tom, Dick & Harry"
         if authors[:3] == "By ":
           authors = authors[3:]
         # "Tom, Dick, and Harry"
         # "Tom, Dick and Harry"
+        authors = authors.replace(" & ", ", ")
+        # Consider having a username without ampersands in it.
         authors = authors.replace(", and", ", ")
         authors = authors.replace(" and ", ", ")
         # "Tom, Dick, Harry"
         authors = authors.split(", ")
         # ["Tom", "Dick", "Harry"]
+        for i in range(0, len(authors)):
+          if authors[i] == "":
+            authors[i] = "none"
+          else:
+            # Clean out trailing spaces and gobbledygook.
+            authors[i] = authors[i].replace("  ", " ")
+            if authors[i][0] == " ":
+              authors[i] = authors[i][1:]
+            if authors[i][-1] == " ":
+              authors[i] = authors[i][:-1]
+            if authors[i][-1] == ".":
+              authors[i] = authors[i][:-1]
+
         article["authors"] = authors
         print(f"Authors: {str(authors)}")
 

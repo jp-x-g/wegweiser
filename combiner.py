@@ -56,9 +56,9 @@ def updateArrayItems(baseArray, updateArray):
         #print(updateArray[j])
         # Go over every entry in the updating array.
         if (baseArray[i]["date"] == updateArray[j]["date"]) and (baseArray[i]["subpage"] == updateArray[j]["subpage"]):
-          print(baseArray[i])
-          print(updateArray[j])
-          print("Match!")
+          #print(baseArray[i])
+          #print(updateArray[j])
+          #print("Match!")
           # And if it matches the entry in the base array...
           for key in updateArray[j]:
             # Go through every key in the updating array....
