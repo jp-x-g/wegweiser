@@ -31,7 +31,7 @@ year_end    = current_year
 days        = 180
 
 ## Shorter values, for testing purposes
-#month_range = 2
+month_range = 7
 #year_start  = 2021
 #year_end    = 2022
 #days        = 180
@@ -61,6 +61,8 @@ print(f"Retrieved {len(all_articles)} issues. Breakdown by year:")
 for year in all_articles:
   print(f"{year}: {len(all_articles[year])}")
 # print(json.dumps(all_articles, indent=2))
+
+errors = ""
 
 for year in all_articles:
   print(f"{year} ({len(all_articles[year])} articles) - beginning metadata retrieval.")
@@ -102,6 +104,7 @@ for year in all_articles:
             print(f"Title: {article['title']}")
         except Exception as err:
           print(f"Title error: {err}")
+          errors += f"\nTitle error : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
 
       ########################################
       # Attempt to find the authors. Tricky!
@@ -118,6 +121,7 @@ for year in all_articles:
           authors = authors[0].text
       except Exception as err:
         print(f"Author error: {err}")
+        errors += f"\nAuthor error: Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
         authors = "none"
 
       # At this point, if there are any authors at all...
@@ -160,5 +164,7 @@ print(all_articles)
 f = open("metadata/" + save_name, "w")
 f.write(json.dumps(all_articles, indent=2))
 f.close()
+
+print(errors)
 
 exit()

@@ -5,6 +5,7 @@ notes.txt
 testing/*
 
 # Data
+data/*
 views/*
 combined/*
 tables/*

@@ -62,7 +62,7 @@ def updateArrayItems(baseArray, updateArray):
           # And if it matches the entry in the base array...
           for key in updateArray[j]:
             # Go through every key in the updating array....
-            if key not in (baseArray[i]) or (baseArray[i][key] == "unparsed") or (baseArray[i][key] == ["unparsed"]):
+            if key not in (baseArray[i]) or (baseArray[i][key] == "unparsed") or (baseArray[i][key] == ["unparsed"]) or (baseArray[i][key] == "none") or (baseArray[i][key] == ["none"]) or (baseArray[i][key] == "") or (baseArray[i][key] == [""]):
               # and add the key/value to baseArray... if it doesn't already exist.
               if updateArray[j][key] != "unparsed":
                 #Unless it's "unparsed".
