@@ -120,9 +120,13 @@ try:
     broken_string += f"\n* [[Module:Signpost/index/{year['year']}]] / [https://en.wikipedia.org/w/index.php?title=Module:Signpost/index/{year['year']}&action=edit edit]"
     for fail in year.keys():
       if (fail != "year") and (fail != "items"):
-        broken_string += f"\n==== {fail} ===="
+        failcount = 0
+        broken_string_add = f"\n==== {fail} ===="
         for page in year[fail]:
-          broken_string += f"\n# [[Wikipedia:Wikipedia Signpost/{page}]]"
+          failcount += 1
+          broken_string_add += f"\n# [[Wikipedia:Wikipedia Signpost/{page}]]"
+        if failcount > 0:
+          broken_string += broken_string_add
 except Exception as err:
  print(err)
  print(broken_string)
@@ -132,8 +136,10 @@ print(broken_string)
 
 output_string = "== Table of indices =="
 output_string += "\n"
+output_string += "__TOC__"
+output_string += "\n<onlyinclude>"
 output_string += table_string
-output_string += "\n"
+output_string += "\n</onlyinclude>"
 output_string += broken_string
 
 file_name = "data/validate.txt"

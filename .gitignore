@@ -3,6 +3,7 @@ test*
 temp.py
 notes.txt
 testing/*
+purge_list.txt
 
 # Data
 data/*

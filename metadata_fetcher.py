@@ -31,7 +31,7 @@ year_end    = current_year
 days        = 180
 
 ## Shorter values, for testing purposes
-month_range = 7
+# month_range = 7
 #year_start  = 2021
 #year_end    = 2022
 #days        = 180
