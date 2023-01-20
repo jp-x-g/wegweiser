@@ -1,5 +1,4 @@
 # Testing
-test*
 temp.py
 notes.txt
 testing/*
@@ -11,8 +10,13 @@ views/*
 combined/*
 tables/*
 metadata/*
-__pycache__/*
+
+# Python bytecode
+__pycache__
 
 # Config
 cfg/*
 cfg/login.txt
+
+# Virtual environments
+venv/

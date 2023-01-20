@@ -1,10 +1,14 @@
 # JPxG 2023 01 04
 import datetime
+import functools
 import requests
 import json
 import urllib
-import luadata
 import sys
+
+import luadata
+
+import lua_serializer
 
 headers = {"User-Agent": "JPxG's hoopty script (https://en.wikipedia.org/wiki/User:JPxG)"}
 
@@ -24,15 +28,41 @@ def fetch(indexyear):
     print(f'Error retrieving {url}')
     return(f"Error retrieving {indexyear}")
 
-def luaify(some_json, indent=1):
-    return luadata.serialize(some_json, encoding="utf-8", indent="\t", indent_level=indent)
+table_key_priorities = {
+    "date": 0,
+    "subpage": 1,
+    "title": 2,
+    "authors": 3,
+    "tags": 4,
+    "views": 5,
+}
+
+def compare_table_keys(a, b):
+    a_priority = table_key_priorities.get(a)
+    b_priority = table_key_priorities.get(b)
+    if a_priority is not None and b_priority is not None:
+        return -1 if a_priority < b_priority else 1
+    elif a_priority is not None:
+        return -1
+    elif b_priority is not None:
+        return 1
+    else:
+        return -1 if a < b else 1
+
+def luaify(obj):
+    return lua_serializer.serialize(
+        obj,
+        indent="\t",
+        min_single_line_indent_level=2,
+        table_sort_key=functools.cmp_to_key(compare_table_keys),
+    )
 
 if __name__ == "__main__":
   print("/!\\ This file is usually not run on its own!")
   print("lua_wrangler.py has several functions:")
   print("> fetch(year): retrieves wikitext of Module:Signpost/index/year,")
-  print("  converts Lua table to JSON, and returns it.")
-  print("> luaify(json): returns JSON serialized to a Lua table.")
+  print("  converts Lua table to a Python object, and returns it.")
+  print("> luaify(obj): serializes a Python object to a Lua table.")
   print("> main (not called from any other script):")
   print("  print this message, retrieve and print index for CURRENTYEAR,")
   print("  and (optionally) save it to an output file, viz.")
