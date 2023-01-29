@@ -31,6 +31,8 @@ def purge(page_name, summary=f"Null edit - Wegweiser V{weg_ver.str()}"):
 	auth = f.read()
 	f.close()
 	auth = auth.split("\n")
+
+	print(auth)
 	
 	print(f"Attempting to authenticate.")
 	print(f"Username: {auth[0]}")
@@ -117,6 +119,7 @@ if (__name__ == "__main__"):
 		print("  Performs a null-edit to purge the cache of that page.")
 		print("  Uses authentication details from cfg/login.txt")
 		print("  Auth details should be formatted like this:")
+		print("  ")
 		print("DogBot@General_woofing_tasks")
 		print("asdjkflh23kj4lh789ghasdlrth34978")
 		print("  ")

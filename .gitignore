@@ -3,6 +3,10 @@ temp.py
 notes.txt
 testing/*
 purge_list.txt
+statisticized*
+purge_list.txt
+test*
+mass_tag.txt
 
 # Data
 data/*

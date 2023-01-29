@@ -10,9 +10,10 @@ import luadata
 
 import lua_serializer
 
-headers = {"User-Agent": "JPxG's hoopty script (https://en.wikipedia.org/wiki/User:JPxG)"}
+import weg_ver
 
 def fetch(indexyear):
+  headers = weg_ver.headers()
   page_name = f"Module:Signpost/index/{str(indexyear)}"
   page_name = urllib.parse.quote(page_name, safe='')
   url = f"https://en.wikipedia.org/w/api.php?action=parse&page={page_name}&prop=wikitext&format=json&formatversion=2"
@@ -50,6 +51,7 @@ def compare_table_keys(a, b):
         return -1 if a < b else 1
 
 def luaify(obj):
+    headers = weg_ver.headers()
     return lua_serializer.serialize(
         obj,
         indent="\t",

@@ -100,7 +100,7 @@ for year in all_articles:
     #print(article)
     #print(article['subpage'])
     #print(f"Retrieving pageviews for {article['date']}/{article['subpage']}")
-    #print(url)
+    print(url)
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
       # print(f'Retrieved {url}')
