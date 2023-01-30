@@ -79,9 +79,8 @@ print(f"Fetched Lua and wrangled into JSON... Items: {len(lua_json)}")
 print("what da")
 
 if (hit_list_file != "false"):
-  f = open(hit_list_file, "r")
-  cat_list = f.read()
-  f.close()
+  with open(hit_list_file, "r", encoding="utf-8") as f:
+    cat_list = f.read()
   cat_list = cat_list.split("\n")
   print(f"Fetched tag list.                     Items: {len(cat_list)}")
 else:
@@ -118,13 +117,11 @@ for item in cat_list:
 
 print(f"Total tags added: {total_tags_added}")
 
-g = open("combined/combine-" + str(combine_year) + ".json", "w")
-g.write(json.dumps(lua_json, indent=2))
-g.close()
+with open("combined/combine-" + str(combine_year) + ".json", "w", encoding="utf-8") as g:
+  g.write(json.dumps(lua_json, indent=2))
 
-h = open("combined/lua-" + str(combine_year) + ".txt", "w")
-h.write("return " + lua_wrangler.luaify(lua_json))
-h.close()
+with open("combined/lua-" + str(combine_year) + ".txt", "w", encoding="utf-8") as h:
+  h.write("return " + lua_wrangler.luaify(lua_json))
 
 print("Success: combined/combine-" + str(combine_year) + ".json and combined/lua-" + str(combine_year) + ".txt")
 
