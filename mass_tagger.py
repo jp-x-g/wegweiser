@@ -3,9 +3,7 @@ import datetime
 import requests
 import json
 import urllib
-import luadata
 import sys
-# python -m pip install --upgrade luadata
 # These ones are from the same directory.
 import lua_wrangler
 import article_fetcher
@@ -75,15 +73,14 @@ else:
 
 print(f"Attempting to mass-tag for {combine_year}.")
 
-lua_json = lua_wrangler.fetch(combine_year)
-print(f"Fetched Lua and wrangled into JSON... Items: {len(lua_json)}")
+year_data = lua_wrangler.fetch(combine_year)
+print(f"Fetched and deserialized Signpost year data... Items: {len(year_data)}")
 
 print("what da")
 
 if (hit_list_file != "false"):
-  f = open(hit_list_file, "r")
-  cat_list = f.read()
-  f.close()
+  with open(hit_list_file, "r", encoding="utf-8") as f:
+    cat_list = f.read()
   cat_list = cat_list.split("\n")
   print(f"Fetched tag list.                     Items: {len(cat_list)}")
 else:
@@ -94,7 +91,7 @@ cat = []
 
 total_tags_added = 0
 
-print(f"Size of lua_json: {sys.getsizeof(lua_json)}")
+print(f"Size of year_data: {sys.getsizeof(year_data)}")
 
 for item in cat_list:
   print(item)
@@ -109,42 +106,26 @@ for item in cat_list:
     item_subpage = item[11:]
     # Arbitration report
 
-    for index in range(0, len(lua_json)):
-      if (lua_json[index]["date"] == item_date) and (lua_json[index]["subpage"] == item_subpage):
+    for index in range(0, len(year_data)):
+      if (year_data[index]["date"] == item_date) and (year_data[index]["subpage"] == item_subpage):
         # We've found this item in the index.
-        if "tags" not in lua_json[index]:
+        if "tags" not in year_data[index]:
           pass
-        elif add_tag not in lua_json[index]["tags"]:
+        elif add_tag not in year_data[index]["tags"]:
           total_tags_added += 1
-          lua_json[index]["tags"].append(add_tag)
+          year_data[index]["tags"].append(add_tag)
 
 print(f"Total tags added: {total_tags_added}")
 
-g = open("combined/combine-" + str(combine_year) + ".json", "w")
-g.write(json.dumps(lua_json, indent=2))
-g.close()
+json_path = f"combined/combine-{combine_year}.json"
+with open(json_path, "w", encoding="utf-8") as g:
+  g.write(json.dumps(year_data, indent=2))
 
-output = str(lua_json)
-# Now for the truly hoopty nonsense.
+lua_path = f"combined/lua-{combine_year}.txt"
+with open(lua_path, "w", encoding="utf-8") as h:
+  h.write("return " + lua_wrangler.luaify(year_data))
 
-outputtwo = luadata.serialize(lua_json, encoding="utf-8", indent="\t", indent_level=1)
-outputtwo = "return " + outputtwo
-
-# Make the sub-lists for tags be on one line instead of indented quadrice on multiple lines.
-outputtwo = outputtwo.replace('\n\t\t\t\t"', ' "')
-# Replace "tab tab {" with "tab {"
-outputtwo = outputtwo.replace("\n\t\t{", "\n\t{")
-# Replace "tab tab tab }" for sub-lists with normal closing brace.
-outputtwo = outputtwo.replace("\n\t\t\t}", " }")
-# De-indent individual items in 
-outputtwo = outputtwo.replace("\n\t\t\t", "\n\t\t")
-#print(outputtwo)
-
-h = open("combined/lua-" + str(combine_year) + ".txt", "w")
-h.write(str(outputtwo))
-h.close()
-
-print("Success: combined/combine-" + str(combine_year) + ".json and combined/lua-" + str(combine_year) + ".txt")
+print(f"Success: {json_path} and {lua_path}")
 
 
 
