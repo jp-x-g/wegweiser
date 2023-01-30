@@ -73,8 +73,8 @@ else:
 
 print(f"Attempting to mass-tag for {combine_year}.")
 
-lua_json = lua_wrangler.fetch(combine_year)
-print(f"Fetched Lua and wrangled into JSON... Items: {len(lua_json)}")
+year_data = lua_wrangler.fetch(combine_year)
+print(f"Fetched and deserialized Signpost year data... Items: {len(year_data)}")
 
 print("what da")
 
@@ -91,7 +91,7 @@ cat = []
 
 total_tags_added = 0
 
-print(f"Size of lua_json: {sys.getsizeof(lua_json)}")
+print(f"Size of year_data: {sys.getsizeof(year_data)}")
 
 for item in cat_list:
   print(item)
@@ -106,22 +106,22 @@ for item in cat_list:
     item_subpage = item[11:]
     # Arbitration report
 
-    for index in range(0, len(lua_json)):
-      if (lua_json[index]["date"] == item_date) and (lua_json[index]["subpage"] == item_subpage):
+    for index in range(0, len(year_data)):
+      if (year_data[index]["date"] == item_date) and (year_data[index]["subpage"] == item_subpage):
         # We've found this item in the index.
-        if "tags" not in lua_json[index]:
+        if "tags" not in year_data[index]:
           pass
-        elif add_tag not in lua_json[index]["tags"]:
+        elif add_tag not in year_data[index]["tags"]:
           total_tags_added += 1
-          lua_json[index]["tags"].append(add_tag)
+          year_data[index]["tags"].append(add_tag)
 
 print(f"Total tags added: {total_tags_added}")
 
 with open("combined/combine-" + str(combine_year) + ".json", "w", encoding="utf-8") as g:
-  g.write(json.dumps(lua_json, indent=2))
+  g.write(json.dumps(year_data, indent=2))
 
 with open("combined/lua-" + str(combine_year) + ".txt", "w", encoding="utf-8") as h:
-  h.write("return " + lua_wrangler.luaify(lua_json))
+  h.write("return " + lua_wrangler.luaify(year_data))
 
 print("Success: combined/combine-" + str(combine_year) + ".json and combined/lua-" + str(combine_year) + ".txt")
 
