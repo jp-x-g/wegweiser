@@ -40,7 +40,7 @@ def updateArray(baseArray, updateArray):
             baseArray.append(updateDict[key])
     return baseArray
 
-def updateArrayItems(baseArray, updateArray):
+def updateArrayItems(baseArray, updateArray, forceUpdate=False, keepTitles=False):
     """
     This will update keys in array items, rather than the items themselves.
     For example, if you want to fill in missing "title" fields for articles,
@@ -62,11 +62,14 @@ def updateArrayItems(baseArray, updateArray):
           # And if it matches the entry in the base array...
           for key in updateArray[j]:
             # Go through every key in the updating array....
-            if key not in (baseArray[i]) or (baseArray[i][key] == "unparsed") or (baseArray[i][key] == ["unparsed"]) or (baseArray[i][key] == "none") or (baseArray[i][key] == ["none"]) or (baseArray[i][key] == "") or (baseArray[i][key] == [""]):
+            if key not in (baseArray[i]) or (forceUpdate == True) or (baseArray[i][key] == "unparsed") or (baseArray[i][key] == ["unparsed"]) or (baseArray[i][key] == "none") or (baseArray[i][key] == ["none"]) or (baseArray[i][key] == "") or (baseArray[i][key] == [""]):
               # and add the key/value to baseArray... if it doesn't already exist.
               if updateArray[j][key] != "unparsed":
                 #Unless it's "unparsed".
-                baseArray[i][key] = updateArray[j][key]
+                if (key == "title") and (key in (baseArray[i])) and (keepTitles == True):
+                  pass
+                else:
+                  baseArray[i][key] = updateArray[j][key]
             if key in baseArray[i]:
               # But if there's already something for that key, don't do anything.
               pass
@@ -87,6 +90,17 @@ update_metadata = True
 
 if len(sys.argv) > 1:
   combine_year = int(sys.argv[1])
+
+force = False
+keeptitles = False
+
+if len(sys.argv) > 2:
+  if (sys.argv[2] == "-f") or (sys.argv[2] == "--force") or (sys.argv[2] == "f"):
+    force = True
+
+if len(sys.argv) > 3:
+  if (sys.argv[3] == "-k") or (sys.argv[3] == "--keeptitles") or (sys.argv[3] == "k"):
+    keeptitles = True
 
 print(f"Attempting to combine for {combine_year}.")
 
@@ -129,7 +143,7 @@ if update_metadata == True:
   meta_data = json.loads(meta_data)
   meta_data = meta_data[str(combine_year)]
   
-  lua_json = updateArrayItems(lua_json, meta_data)
+  lua_json = updateArrayItems(lua_json, meta_data, forceUpdate=force, keepTitles=keeptitles)
 
 
 ###############################################################################
