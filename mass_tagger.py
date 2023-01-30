@@ -117,13 +117,15 @@ for item in cat_list:
 
 print(f"Total tags added: {total_tags_added}")
 
-with open("combined/combine-" + str(combine_year) + ".json", "w", encoding="utf-8") as g:
+json_path = f"combined/combine-{combine_year}.json"
+with open(json_path, "w", encoding="utf-8") as g:
   g.write(json.dumps(year_data, indent=2))
 
-with open("combined/lua-" + str(combine_year) + ".txt", "w", encoding="utf-8") as h:
+lua_path = f"combined/lua-{combine_year}.txt"
+with open(lua_path, "w", encoding="utf-8") as h:
   h.write("return " + lua_wrangler.luaify(year_data))
 
-print("Success: combined/combine-" + str(combine_year) + ".json and combined/lua-" + str(combine_year) + ".txt")
+print(f"Success: {json_path} and {lua_path}")
 
 
 
