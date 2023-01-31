@@ -13,6 +13,7 @@ import lua_wrangler
         ('"foo"', r'"\"foo\""'),
         (r"\"", r'"\\\""'),
         ("foo\nbar", '"foo\\nbar"'),
+        ("über", '"über"'),
     ],
 )
 def test_make_lua_string(text, expected):

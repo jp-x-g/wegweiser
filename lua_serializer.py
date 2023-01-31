@@ -32,7 +32,7 @@ LUA_RESTRICTED_TOKENS = {
 def make_lua_string(s):
     if not isinstance(s, str):
         raise TypeError(f"make_lua_string expects strings ({type(s).__name__} given)")
-    return json.dumps(s)
+    return json.dumps(s, ensure_ascii=False)
 
 
 lua_name_regex = re.compile("[_a-zA-Z][_a-zA-Z0-9]*")  # Basic Lua name requirements
