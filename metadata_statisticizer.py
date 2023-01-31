@@ -9,395 +9,25 @@ import sys
 import luadata
 
 import lua_wrangler
+import tsv_to_wikitable
+import uploader
 
+import weg_ver
+
+tags_path = "data/statisticized-tags.txt"
+auth_path = "data/statisticized-auth.txt"
 
 def biglist():
-	return ["(May 29 to June 11) Benmite",
-		"[User:GerardM",
-		"{{{2}}}",
-		"2 May",
-		"3 July 2006",
-		"03 July 2006",
-		"3family6",
-		"3family6 1 April 2016 19:58 (UTC)",
-		"5 December 2005",
-		"05 November 2007",
-		"10 other editors",
-		"11 other editors",
-		"12 August 2015",
-		"14 April",
-		"18 August",
-		"19 November 2012",
-		"24 April",
-		"24 April 2016",
-		"26 April 2010",
-		"27 other editors,",
-		"28 other editors",
-		"32 other editors",
-		"38 editors",
-		"51 other editors",
-		"53 other editors",
-		"79 other editors",
-		"91 editors",
-		"106 editors on the French Wikipedia; translated for The Signpost by JohnNewton8",
-		"273 other editors",
-		"1233",
-		"2008",
-		"16912 Rhiannon 15 July 2015",
-		"Aaron Shaw",
-		"Aaronshaw",
-		"Adam Cuerden",
-		"Adam Cuerden (gallery)",
-		"Adam Cuerden (rest)",
-		"Amir Aharoni",
-		"Amir E. Aharoni",
-		"Andreas Kolbe (Fundraising)",
-		"Andreas Kolbe (leads",
-		"Andreas Kolbe (published 15 February 2016)",
-		"Andreas Kolbe (second",
-		"Andreas Kolbe 00:45 (UTC)",
-		"Andreas Kolbe 1 April 2016 19:58 (UTC)",
-		"Andreas Kolbe 03:08 (UTC)",
-		"Andreas Kolbe 19 March 2016 21:12 (UTC)",
-		"Andreas Kolbe 22:41 (UTC)",
-		"Andreas Kolbe 27 March 2016 03:24 (UTC)",
-		"Andrew Lih 27 March 2016 03:24 (UTC)",
-		"Andrewman327",
-		"Andrewman327 (first lead)",
-		"Andrewman327 (lead)",
-		"Anthere",
-		"Anthere (Florence Devouard)",
-		"Anton Protsiuk",
-		"Anton Protsiuk with Viacheslav Fedchenkov",
-		"Barbara (WVS)",
-		"Based on text posted at Deceased Wikipedians",
-		"Belugaboy",
-		"Belugaboy535136",
-		"bluerasberry",
-		"Lane Rasberry 00:45 (UTC)",
-		"brassratgirl",
-		"Brassratgirl",
-		"Bri for The Signpost team",
-		"Brian C. Keegan",
-		"Brian Keegan",
-		"Brianboulton",
-		"Brianboulton (main)",
-		"brief notes)",
-		"by Cryptic C62",
-		"by Hiding",
-		"By Jarry1250",
-		"by Jonathan",
-		"By Kaldari",
-		"By Legoktm",
-		"by Phoebe",
-		"by Ragesoss",
-		"by Resident Mario",
-		"by Smallbones",
-		"by Tech Ambassadors",
-		"By: JayHenry",
-		"By: you?",
-		"Catherine",
-		"CatherineMunro",
-		"Chris troutman",
-		"Chris Troutman",
-		"Chris Troutman (first lead)",
-		"Colin",
-		"Colin M",
-		"Communications; Talent",
-		"Community Advocacy)",
-		"Compiled by Smallbones",
-		"coordinators of the Guild of Copy Editors",
-		"Copied from Deceased Wikipedians/2020",
-		"Copied with some editing from Deceased Wikipedians/2020",
-		"Culture)",
-		"Cwmhiraeth",
-		"Cwmhiraeth (introduction)",
-		"Cwmhiraeth (text) 18 June 2017",
-		"Denny",
-		"Denny Vrandečić",
-		"Denny Vrandečić (User:Denny)",
-		"DerHexer",
-		"DerHexer (Engineering",
-		"Diego Saez-Trumper (Wikimedia Foundation) .",
-		"Digital Communications Manager",
-		"DiplomatTesterMan",
-		"DiplomatTesterMan who wishes to thank the many editors who helped with this article",
-		"Ed",
-		"Ed Erhart",
-		"Ed Erhart (WMF)",
-		"Ed Erhart 19 March 2016 21:12 (UTC)",
-		"Ed Erhart; edited for brevity by Barbara Page",
-		"Eddie891 (gallery)",
-		"Eddie891 (gallery), Cwmhiraeth (text) 1 September 2017",
-		"edited by User:Michael Snow",
-		"EpicPupper for the Signpost team",
-		"filling in for Michael Snow",
-		"From the editors",
-		"Fuzheado (brief notes)",
-		"Gabriel Thullen",
-		"Gamaliel (Conceptual barrier)",
-		"Gamaliel (in briefs)",
-		"Gamaliel (lead stories",
-		"Gamaliel (lead stories)",
-		"Gamaliel (lead)",
-		"Gamaliel (secondary lead",
-		"Gamaliel (secondary leads",
-		"Gamaliel 00:45 (UTC)",
-		"Gamaliel 1 April 2016 19:58 (UTC)",
-		"Gamaliel 27 March 2016 03:24 (UTC)",
-		"GamerPro64 00:45 (UTC)",
-		"GamerPro64 22:41 (UTC)",
-		"GamerPro64 27 March 2016 03:24 (UTC)",
-		"Germany)",
-		"Go Phightins! (in briefs)",
-		"Go Phightins! (lead story",
-		"Go Phightins! (lead)",
-		"Go Phightins! (leads",
-		"Go Phightins! (leads 1–3",
-		"Go Phightins! (Legal",
-		"Go Phightins! (main",
-		"Godot13 (text)",
-		"Godot13 (text); Adam Cuerden (gallery)",
-		"Gog the Mild.",
-		"Graham87 (transcript)",
-		"Greg Williams edited by Barbara Page",
-		"Hafspajen‎",
-		"Hafspajen (layout)",
-		"Hafspajen also Xanthomelanoussprog",
-		"Hahc21 (featured content)",
-		"Hahc21 (WikiLang)",
-		"igordebraga",
-		"Igordebraga",
-		"Igordebraga",
-		"Igordebraga. Rebestalic",
-		"in brief)",
-		"in briefs)",
-		"increasingly not",
-		"Inho Hong (Center for Humans & Machines",
-		"Interviewed by Smallbones",
-		"introduced by Bri",
-		"Ira Brad Matetsky (Newyorkbrad)",
-		"Ironholds",
-		"Iryna Yehiazarova",
-		"Isaac (WMF)",
-		"Isaac Johnson",
-		"J Milburn (report)",
-		"J Milburn (WikiCup update)",
-		"Jayen466 (in brief)",
-		"Jayen466 (in briefs)",
-		"Jayen466 (leads 4–5",
-		"Jayen466 (second lead",
-		"Jayen466 (second lead)",
-		"Joe Sutherland (Wikimedia Foundation communications intern)",
-		"Jonatan Svensson Glad (Josve05a)",
-		"Jonathan Morgan",
-		"Jonathan T. Morgan",
-		"jorgenev",
-		"Josve05a",
-		"Jules*",
-		"Jwslubbock – Communications Coordinator at Wikimedia UK",
-		"Keegan Peterzell (Community Liaison",
-		"Keilana (in briefs)",
-		"‎Kelapstick",
-		"Kevin Gorman",
-		"Kevin Rutherford (in briefs)",
-		"Kirill",
-		"Kirill Lokshin (in briefs)",
-		"Lead 1 by Tony1; lead 2 by Peaceray; in briefs by Pine",
-		"Legoktm 19 March 2016 21:12 (UTC)",
-		"Liam Wyatt",
-		"Liam Wyatt (Wittylama)",
-		"Liam Wyatt 19 March 2016 21:12 (UTC)",
-		"Liang (WMTW)",
-		"Liang Chih Shang Kuan on 2 June 2015 – Permanent link",
-		"Lila Tretikov",
-		"Lisa Seitz-Gruwell",
-		"Lgruwell-WMF",
-		"lists)",
-		"Lydia Pintscher (Wikimedia Deutschland)",
-		"Matthew (WMF)",
-		"Max Planck Institute for Human Development",
-		"Mcrsftdog",
-		"Meeyoung Cha (Institute for Basic Science",
-		"Megalibrarygirl",
-		"Megalibrarygirl",
-		"members of the Wikimedia community",
-		"Mercurywoodrose (interviewed by Smallbones)",
-		"milowent",
-		"Milowent 00:45 (UTC)",
-		"Milowent 03:08 (UTC)",
-		"Milowent 19 March 2016 21:12 (UTC)",
-		"Milowent 22:41 (UTC)",
-		"Miriam Redi",
-		"Miriam Redi",
-		"Muhammad Mahdi Karim (pictures)",
-		"multiple editors; selected by Pine",
-		"Ɱ",
-		"ɱ (articles); Adam Cuerden",
-		"Natalia Szafran-Kozakowska (WMPL)",
-		"Newyorkbrad",
-		"NMaia (Wikidata)",
-		"none",
-		"Oshawott 12 with support from several other editors within the Hong Kong Wikimedia Community",
-		"OSX",
-		"other believers",
-		"other comedic wannabes",
-		"Peaceray (in brief)",
-		"Peaceray (lead story)",
-		"Pete Forsyth 19 March 2016 21:12 (UTC)",
-		"Peteforsyth",
-		"phoebe",
-		"Pine (in briefs)",
-		"Pine (news)",
-		"Pine (WikiCup)",
-		"Piotr Konieczny",
-		"Piotrus",
-		"Pretzels",
-		"Pretzels (as edited by Wikipedians)",
-		"Product Development",
-		"Product)",
-		"pythoncoder",
-		"ragesoss",
-		"Resident Mario (brief notes)",
-		"Resident Mario (main author",
-		"Risker with FULBERT",
-		"Samw",
-		"Samwalton9",
-		"Sandstein",
-		"SandyGeorgia",
-		"Saqib",
-		"Saqib Qayyum",
-		"Sarah Stierch",
-		"SarahStierch",
-		"SarahSV",
-		"Scott (in briefs)",
-		"selected by Barbara Page",
-		"Selected by Barbara Page",
-		"Selected By Barbara Page",
-		"selected by Bri",
-		"Selected by Bri",
-		"Selected by DannyS712",
-		"Selected by EpicPupper",
-		"selected by Kudpung",
-		"Selected by Kudpung",
-		"Selected by Kudpung (image added by The Signpost)",
-		"Selected by MJL",
-		"Selected by SoWhy",
-		"Selsharbaty (WMF)",
-		"Senior Analyst",
-		"Senior Product Manager",
-		"Serendipodous 1 April 2016 19:58 (UTC)",
-		"Serendipodous 27 March 2016 03:24 (UTC)",
-		"Serendipodous,",
-		"Seresin",
-		"SGrabarczuk (WMF)",
-		"Signpost columnist",
-		"Signpost contributing editors",
-		"Signpost editorial board",
-		"Signpost staff",
-		"sj",
-		"Smurrayinchester (in brief)",
-		"Soulbust",
-		"South Korea & KAIST)",
-		"Sross (Public Policy)",
-		"Stephen LaPorte 1 April 2016 19:58 (UTC)",
-		"Szymon Grabarczuk (WMF)",
-		"T.Shafee (Evo&Evo)",
-		"T.Shafee(Evo&Evo)",
-		"Tbayer",
-		"Tbayer (WMF)",
-		"Ted Cruz",
-		"The ed17 (all)",
-		"The ed17 (Featured content); Miyagawa",
-		"The ed17 (in brief)",
-		"The ed17 (in briefs)",
-		"The ed17 (in briefs) 11 December 2013",
-		"The ed17 (lead",
-		"The ed17 (lead)",
-		"The ed17 (main);",
-		"The ed17 (Wikipedia Zero)",
-		"The Herald (articles",
-		"The Herald (articles)",
-		"The Herald (layout)",
-		"The Herald (WikiCup report)",
-		"the Signpost editorial board",
-		"The Signpost editors",
-		"The Signpost staff",
-		"the Wikimedia Foundation",
-		"the Wikipedia community",
-		"the Wikipedia community",
-		"the WMF Language Engineering team",
-		"the wub",
-		"The wub",
-		"The_ed17",
-		"third leads",
-		"Tilman Bayer 1 April 2016 19:58 (UTC)",
-		"Tilman Bayer 03:08 (UTC)",
-		"Tim Starling 1 April 2016 19:58 (UTC)",
-		"Tim Vickers",
-		"TimVickers",
-		"Tony Sidaway",
-		"Tony1 (editorial revision)",
-		"Tony1 (in brief)",
-		"Tony1 (interview)",
-		"Tony1 (lead)",
-		"Tony1 (main story)",
-		"Tony1 (main)",
-		"Tony1 (POTY)",
-		"Tony1 (second lead)",
-		"Tony1 (secondary main",
-		"Tony1 03:08 (UTC)",
-		"Tony1 22:41 (UTC)",
-		"Tony1 27 March 2016 03:24 (UTC)",
-		"translated by Circeus",
-		"twenty-four Wikipedians",
-		"unparsed",
-		"updated by Brianboulton",
-		"updated by Ta bu shi da yu",
-		"User:2",
-		"User:3",
-		"User:Adam Cuerden",
-		"User:Diannaa 22:41 (UTC)",
-		"User:Seattle",
-		"User:Stormy clouds",
-		"User:Vysotsky",
-		"User:WWB",
-		"Username",
-		"Vade Retro February 2015",
-		"Violet/Riga",
-		"Whatamidoing (WMF)",
-		"Wikimedia Deutschland",
-		"Wikimedia Foundation",
-		"Wikimedia Foundation)",
-		"Wikiolo",
-		"WikiPuppies",
-		"Wikizach",
-		"William Beutler",
-		"William Beutler (Identity crisis)",
-		"William Beutler (WWB)",
-		"WiseWoman/Debora Weber-Wulff",
-		"with fact checking by Ottre",
-		"with other editors",
-		"with Smallbones",
-		"with some implemented suggestions by Kudpung",
-		"with special thanks to Theodor Seuss Geisel",
-		"with Tony1",
-		"Witty lama",
-		"Witty Lama",
-		"WP:PLANTS members",
-		"WPPilot",
-		"‎Xanthomelanoussprog",
-		"you?",
-		"Your name could be here! See our reorganization plan",
-		"ϢereSpielChequers",
-		"Ата"
+	return [
+	"Authors to search for",
+	"Just put em in the list"
 	]
 
 
 testlist = ["asdf", "asdf2"]
 
 big_list = biglist()
-print(big_list)
+# print(big_list)
 
 alldata = []
 "Attempting to gather all metadata."
@@ -421,9 +51,12 @@ for year in alldata:
 		if "tags" in item:
 			for tag in item["tags"]:
 				if tag in alltags:
-					alltags[tag] += 1
+					alltags[tag][0] += 1
+					# Increment the number of articles with that tag...
+					alltags[tag][1] = item["date"]
+					# and the date of the most recent.
 				else:
-					alltags[tag] = 1
+					alltags[tag] = [1, item["date"]]
 
 		if "authors" in item:
 			for author in item["authors"]:
@@ -433,32 +66,47 @@ for year in alldata:
 					# badshit += f"# [[Wikipedia:Wikipedia Signpost/{item['date']}/{item['subpage']}]]"
 					badshit += f"Wikipedia:Wikipedia Signpost/{item['date']}/{item['subpage']}"
 				if author in allauthors:
-					allauthors[author] += 1
+					allauthors[author][0] += 1
+					# Increment the number of articles written by the author...
+					allauthors[author][1] = item["date"]
+					# and the date of their most recent article.
 				else:
-					allauthors[author] = 1
+					allauthors[author] = [1, item["date"]]
 
 
 
 outputt = ""
 outputa = ""
 
-for key in alltags.keys():
-	outputt += f"{str(key)}\t{str(alltags[key])}\n"
+for key in sorted(alltags.keys()):
+	outputt += f"{str(key)}\t{str(alltags[key][0])}\t{str(alltags[key][1])}\n"
 
-for key in allauthors.keys():
-	outputa += f"{str(key)}\t{str(allauthors[key])}\n"
+for key in sorted(allauthors.keys()):
+	outputa += f"{str(key)}\t{str(allauthors[key][0])}\t{str(allauthors[key][1])}\n"
 
 
 print(alltags)
 print(allauthors)
 
-f = open("test-badshit.txt", "w")
-f.write(str(badshit))
-f.close()
-f = open("statisticized-tags.txt", "w")
+#f = open("test-searchlist.txt", "w")
+#f.write(str(badshit))
+#f.close()
+
+
+outputa = tsv_to_wikitable.process(outputa, headers=[f"Author ({str(len(allauthors))} total)", "#", "Most recent"])
+outputt = tsv_to_wikitable.process(outputt, headers=[f"Tag ({str(len(alltags))} total)", "#", "Most recent"])
+
+# Now to upload them.
+uploader.upload_str(outputt, "Wikipedia:Wikipedia Signpost/Statistics/Tags/Table", summary=f"Update tag information / Wegweiser V{weg_ver.str()}")
+uploader.upload_str(outputa, "Wikipedia:Wikipedia Signpost/Statistics/Authors/Table", summary=f"Update author information / Wegweiser V{weg_ver.str()}")
+
+# Write them to disk as well.
+f = open(tags_path, "w")
 f.write(outputt)
 f.close()
-f = open("statisticized-auth.txt", "w")
+f = open(auth_path, "w")
 f.write(outputa)
 f.close()
-print("Written to statisticized-tags.txt and statisticized-auth.txt")
+print(f"Written to {tags_path} and {auth_path}")
+
+exit()

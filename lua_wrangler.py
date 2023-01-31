@@ -12,9 +12,15 @@ import lua_serializer
 
 import weg_ver
 
-def fetch(indexyear):
+def fetch(indexyear=2005, page=""):
   headers = weg_ver.headers()
-  page_name = f"Module:Signpost/index/{str(indexyear)}"
+
+  # If you pass "page" into this function, it will override the year parsing.
+  if page == "":
+    page_name = f"Module:Signpost/index/{str(indexyear)}"
+  else:
+    page_name = page
+
   page_name = urllib.parse.quote(page_name, safe='')
   url = f"https://en.wikipedia.org/w/api.php?action=parse&page={page_name}&prop=wikitext&format=json&formatversion=2"
   response = requests.get(url, headers=headers)
