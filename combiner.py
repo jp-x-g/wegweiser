@@ -3,9 +3,7 @@ import datetime
 import requests
 import json
 import urllib
-import luadata
 import sys
-# python -m pip install --upgrade luadata
 # These ones are from the same directory.
 import lua_wrangler
 import article_fetcher
@@ -217,24 +215,8 @@ if output_json == True:
   g.write(json.dumps(lua_json, indent=2))
   g.close()
 
-output = str(lua_json)
-# Now for the truly hoopty nonsense.
-
-outputtwo = luadata.serialize(lua_json, encoding="utf-8", indent="\t", indent_level=1)
-outputtwo = "return " + outputtwo
-
-# Make the sub-lists for tags be on one line instead of indented quadrice on multiple lines.
-outputtwo = outputtwo.replace('\n\t\t\t\t"', ' "')
-# Replace "tab tab {" with "tab {"
-outputtwo = outputtwo.replace("\n\t\t{", "\n\t{")
-# Replace "tab tab tab }" for sub-lists with normal closing brace.
-outputtwo = outputtwo.replace("\n\t\t\t}", " }")
-# De-indent individual items in 
-outputtwo = outputtwo.replace("\n\t\t\t", "\n\t\t")
-#print(outputtwo)
-
 h = open("combined/lua-" + str(combine_year) + ".txt", "w")
-h.write(str(outputtwo))
+h.write("return " + lua_wrangler.luaify(lua_json))
 h.close()
 if output_json == True:
   print("Success: combined/combine-" + str(combine_year) + ".json and combined/lua-" + str(combine_year) + ".txt")

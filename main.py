@@ -3,9 +3,9 @@ import datetime
 import requests
 import json
 import urllib
-import luadata
 import sys
-# python -m pip install --upgrade luadata
+
+import lua_wrangler
 
 headers = {"User-Agent": "JPxG's hoopty script (https://en.wikipedia.org/wiki/User:JPxG)"}
 
@@ -1342,7 +1342,7 @@ f = open("indytwo.txt", "w")
 f.write(str(output))
 f.close()
 
-outputtwo = luadata.serialize(indytwo, encoding="utf-8", indent="\t", indent_level=0)
+outputtwo = lua_wrangler.luaify(indytwo)
 
 print(outputtwo)
 
