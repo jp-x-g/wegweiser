@@ -96,7 +96,12 @@ for year in all_articles:
     start_date, end_date = get_date_offset(article["date"])
     # TODO: Make this customizable so you can see mobile, desktop, by country/region, etc
     # This information is already in the pageview stats, and might prove educative.
-    url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{page_name}/daily/{start_date}/{end_date}"
+    url = f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user/{page_name}/daily/{start_date}/{end_date}"
+    #     f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{page_name}/daily/{start_date}/{end_date}"
+    #     (Old string; uses "all-agents" instead of "user", erroneously including automated hits in pageview totals)
+    # See documentation at:
+    #   https://wikitech.wikimedia.org/wiki/Analytics/AQS/Pageviews
+    #   https://wikimedia.org/api/rest_v1/#/Pageviews%20data/get_metrics_pageviews_per_article__project___access___agent___article___granularity___start___end_
     #print(article)
     #print(article['subpage'])
     #print(f"Retrieving pageviews for {article['date']}/{article['subpage']}")

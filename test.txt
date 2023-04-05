@@ -77,40 +77,33 @@ python3 uploader.py combined/lua-2015.txt Module:Signpost/index/2015 Basic_index
 python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;python3 metadata_statisticizer.py;
 
 
-python3 viewfetcher.py 2015
-python3 viewfetcher.py 2016
-python3 viewfetcher.py 2017
-python3 viewfetcher.py 2018
-python3 viewfetcher.py 2019
-python3 viewfetcher.py 2020
-python3 viewfetcher.py 2021
-python3 viewfetcher.py 2022
-python3 viewfetcher.py 2023
-python3 metadata_fetcher.py 2005;python3 combiner.py 2005 -f -k;python3 uploader.py combined/lua-2005.txt Module:Signpost/index/2005 update_metadata_for_authors
-python3 metadata_fetcher.py 2006;python3 combiner.py 2006 -f -k;python3 uploader.py combined/lua-2006.txt Module:Signpost/index/2006 update_metadata_for_authors
-python3 metadata_fetcher.py 2007;python3 combiner.py 2007 -f -k;python3 uploader.py combined/lua-2007.txt Module:Signpost/index/2007 update_metadata_for_authors
-python3 metadata_fetcher.py 2008;python3 combiner.py 2008 -f -k;python3 uploader.py combined/lua-2008.txt Module:Signpost/index/2008 update_metadata_for_authors
-python3 metadata_fetcher.py 2009;python3 combiner.py 2009 -f -k;python3 uploader.py combined/lua-2009.txt Module:Signpost/index/2009 update_metadata_for_authors
-python3 metadata_fetcher.py 2010;python3 combiner.py 2010 -f -k;python3 uploader.py combined/lua-2010.txt Module:Signpost/index/2010 update_metadata_for_authors
-python3 metadata_fetcher.py 2011;python3 combiner.py 2011 -f -k;python3 uploader.py combined/lua-2011.txt Module:Signpost/index/2011 update_metadata_for_authors
-python3 metadata_fetcher.py 2012;python3 combiner.py 2012 -f -k;python3 uploader.py combined/lua-2012.txt Module:Signpost/index/2012 update_metadata_for_authors
-python3 metadata_fetcher.py 2013;python3 combiner.py 2013 -f -k;python3 uploader.py combined/lua-2013.txt Module:Signpost/index/2013 update_metadata_for_authors
-python3 metadata_fetcher.py 2014;python3 combiner.py 2014 -f -k;python3 uploader.py combined/lua-2014.txt Module:Signpost/index/2014 update_metadata_for_authors
-python3 metadata_fetcher.py 2015;python3 combiner.py 2015 -f -k;python3 uploader.py combined/lua-2015.txt Module:Signpost/index/2015 update_metadata_for_authors
-python3 metadata_fetcher.py 2016;python3 combiner.py 2016 -f -k;python3 uploader.py combined/lua-2016.txt Module:Signpost/index/2016 update_metadata_for_authors
-python3 metadata_fetcher.py 2017;python3 combiner.py 2017 -f -k;python3 uploader.py combined/lua-2017.txt Module:Signpost/index/2017 update_metadata_for_authors
-python3 metadata_fetcher.py 2018;python3 combiner.py 2018 -f -k;python3 uploader.py combined/lua-2018.txt Module:Signpost/index/2018 update_metadata_for_authors
-python3 metadata_fetcher.py 2019;python3 combiner.py 2019 -f -k;python3 uploader.py combined/lua-2019.txt Module:Signpost/index/2019 update_metadata_for_authors
-python3 metadata_fetcher.py 2020;python3 combiner.py 2020 -f -k;python3 uploader.py combined/lua-2020.txt Module:Signpost/index/2020 update_metadata_for_authors
-python3 metadata_fetcher.py 2021;python3 combiner.py 2021 -f -k;python3 uploader.py combined/lua-2021.txt Module:Signpost/index/2021 update_metadata_for_authors
-python3 metadata_fetcher.py 2022;python3 combiner.py 2022 -f -k;python3 uploader.py combined/lua-2022.txt Module:Signpost/index/2022 update_metadata_for_authors
-python3 metadata_fetcher.py 2023;python3 combiner.py 2023 -f -k;python3 uploader.py combined/lua-2023.txt Module:Signpost/index/2023 Metadata_for_titles_and_authors; python3 validator.py
-
-
-python3 viewfetcher.py 2022;python3 metadata_fetcher.py 2022;python3 combiner.py 2022;python3 uploader.py combined/lua-2022.txt Module:Signpost/index/2022 Metadata_for_titles_and_authors
-python3 viewfetcher.py 2023;python3 metadata_fetcher.py 2023;python3 combiner.py 2023;python3 uploader.py combined/lua-2023.txt Module:Signpost/index/2023 Metadata_for_titles_and_authors
-
+a
+python3 combiner.py 2005 -f -k;python3 uploader.py combined/lua-2005.txt Module:Signpost/index/2005 test_PR_4_unicode_fix
+python3 combiner.py 2006 -f -k;python3 uploader.py combined/lua-2006.txt Module:Signpost/index/2006 test_PR_4_unicode_fix
+python3 combiner.py 2007 -f -k;python3 uploader.py combined/lua-2007.txt Module:Signpost/index/2007 test_PR_4_unicode_fix
+python3 combiner.py 2008 -f -k;python3 uploader.py combined/lua-2008.txt Module:Signpost/index/2008 test_PR_4_unicode_fix
+python3 combiner.py 2009 -f -k;python3 uploader.py combined/lua-2009.txt Module:Signpost/index/2009 test_PR_4_unicode_fix
+python3 combiner.py 2010 -f -k;python3 uploader.py combined/lua-2010.txt Module:Signpost/index/2010 test_PR_4_unicode_fix
+python3 combiner.py 2011 -f -k;python3 uploader.py combined/lua-2011.txt Module:Signpost/index/2011 test_PR_4_unicode_fix
+python3 combiner.py 2012 -f -k;python3 uploader.py combined/lua-2012.txt Module:Signpost/index/2012 test_PR_4_unicode_fix
+python3 combiner.py 2013 -f -k;python3 uploader.py combined/lua-2013.txt Module:Signpost/index/2013 test_PR_4_unicode_fix
+python3 combiner.py 2014 -f -k;python3 uploader.py combined/lua-2014.txt Module:Signpost/index/2014 test_PR_4_unicode_fix
+python3 combiner.py 2015 -f -k;python3 uploader.py combined/lua-2015.txt Module:Signpost/index/2015 test_PR_4_unicode_fix
+python3 combiner.py 2016 -f -k;python3 uploader.py combined/lua-2016.txt Module:Signpost/index/2016 test_PR_4_unicode_fix
+python3 combiner.py 2017 -f -k;python3 uploader.py combined/lua-2017.txt Module:Signpost/index/2017 test_PR_4_unicode_fix
+python3 combiner.py 2018 -f -k;python3 uploader.py combined/lua-2018.txt Module:Signpost/index/2018 test_PR_4_unicode_fix
+python3 combiner.py 2019 -f -k;python3 uploader.py combined/lua-2019.txt Module:Signpost/index/2019 test_PR_4_unicode_fix
+python3 combiner.py 2020 -f -k;python3 uploader.py combined/lua-2020.txt Module:Signpost/index/2020 test_PR_4_unicode_fix
+python3 combiner.py 2021 -f -k;python3 uploader.py combined/lua-2021.txt Module:Signpost/index/2021 test_PR_4_unicode_fix
+python3 combiner.py 2022 -f -k;python3 uploader.py combined/lua-2022.txt Module:Signpost/index/2022 test_PR_4_unicode_fix
+python3 combiner.py 2023 -f -k;python3 uploader.py combined/lua-2023.txt Module:Signpost/index/2023 test_PR_4_unicode_fix
 python3 validator.py
+python3 metadata_statisticizer.py
+
+
+
+
+
 
 # 2023 Jan 28
 
@@ -163,6 +156,73 @@ python3 mass_retagger.py autobiography delete delete
 python3 mass_retagger.py autoconfirmed delete delete
 python3 mass_retagger.py backup delete delete
 python3 mass_retagger.py bradpatrick delete delete
+
+python3 mass_retagger.py callforcontributors delete delete
+python3 mass_retagger.py cir delete delete
+python3 mass_retagger.py contest contests
+python3 mass_retagger.py corecontest contests
+python3 mass_retagger.py crats bureaucrats
+python3 mass_retagger.py data delete delete
+python3 mass_retagger.py database delete delete
+python3 mass_retagger.py didnotherethat delete delete
+python3 mass_retagger.py disaster delete delete
+python3 mass_retagger.py dmca copyright
+python3 mass_retagger.py donations finance
+python3 mass_retagger.py faircopyrightoz copyright
+python3 mass_retagger.py essay essays
+python3 mass_retagger.py encyclopediabritannica britannica
+python3 mass_retagger.py election elections
+python3 mass_retagger.py obama politicians
+python3 mass_retagger.py donaldtrump politicians
+python3 mass_retagger.py featuredpicture featuredcontent
+python3 mass_retagger.py financial finance
+python3 mass_retagger.py fromtheteam fromtheeditor
+python3 mass_retagger.py fundraising finance
+python3 mass_retagger.py ios delete delete
+python3 mass_retagger.py jews delete delete
+python3 mass_retagger.py heatherwalls delete delete
+python3 mass_retagger.py lawfare legal
+python3 mass_retagger.py lawsuit legal
+python3 mass_retagger.py library libraries
+python3 mass_retagger.py lta vandalism
+python3 mass_retagger.py spi sockpuppetry
+python3 mass_retagger.py rfc policy
+python3 mass_retagger.py verifiability citations
+python3 mass_retagger.py vector2022 vector
+python3 mass_retagger.py webcite citations
+python3 mass_retagger.py webtraffic traffic
+python3 mass_retagger.py transparencyreport transparency
+python3 mass_retagger.py templatedata templates
+python3 mass_retagger.py systematicbias systemicbias
+python3 mass_retagger.py wikilovesafrica wikiloves
+python3 mass_retagger.py wikilovesearth wikiloves
+python3 mass_retagger.py wikimania2006 wm2006
+python3 mass_retagger.py wikimania2016 wm2016
+python3 mass_retagger.py wikimania2017 wm2017
+python3 mass_retagger.py womenscientists women
+python3 mass_retagger.py yahoo megacorps
+python3 mass_retagger.py google megacorps
+python3 mass_retagger.py policyproposals policy
+python3 mass_retagger.py podcast podcasts
+python3 mass_retagger.py obit obituary
+
+
+
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
+python3 mass_retagger.py delete delete
 python3 mass_retagger.py delete delete
 python3 mass_retagger.py delete delete
 python3 mass_retagger.py delete delete
