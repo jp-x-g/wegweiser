@@ -94,7 +94,7 @@ for year in all_articles:
       #print(titles)
       for i in titles: 
         try:
-          if i.has_key("data-signpost-article-title"):
+          if i.has_attr("data-signpost-article-title"):
             # 2017 to present (2023)
             article["title"] = i["data-signpost-article-title"]
             print(f"Title: {article['title']}")
