@@ -90,7 +90,7 @@ def upload_str(source, page_name, summary=f"Wegweiser V{weg_ver.str()}"):
 			"token": token,
 			"title": page_name,
 			"text": source,
-			"summary": f"{summary} / Trial run from [[Wikipedia:Bots/Requests for approval/WegweiserBot|BRFA]] (Wegweiser V{weg_ver.str()})",
+			"summary": f"{summary} / (Wegweiser V{weg_ver.str()})",
 			"format": "json",
 		},
 	)

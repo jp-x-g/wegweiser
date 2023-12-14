@@ -30,11 +30,139 @@ Update indices with pageviews for 2023: fetch metadata, fetch pageview counts, c
 # Individual workflow scripts
 Scripts that are part of the main workflow of the suite: 
 
-## article_fetcher.py
 ## json-tabler.py
-## main.py
-## mass_tagger.py
 
+## purger.py
+## tsv_to_wikitable.py
+
+## lua_serializer.py
+Serializes a Python object to a Lua table.  
+### Arguments  
+`obj` (number, int, float, str, dict, list)  
+The object to serialize.
+
+`indent` (str, optional)  
+The string to indent with, e.g. `\t` or `  `.
+
+`indent_level` (int, optional)  
+The initial indentation level.
+
+`min_single_line_indent_level` (int, optional)  
+At this indentation level or above, tables will be formatted on a single line.
+
+`table_sort_key` (Callable, optional)  
+A key function with which to sort keys of Lua tables. If not specified, the table is not sorted. For details of key functions, see https://docs.python.org/3/howto/sorting.html#key-functions.
+
+### Output  
+`string`  
+Returns a serialized Lua data table string.
+
+## metadata_fetcher.py
+Retrieves and adds metadata, like titles and authors, to Signpost article entries for a given date range.
+### Arguments  
+`year` (optional)  
+The start and end year to fetch metadata for. If not provided, defaults to the current year.
+### What it does
+* Uses the `article_fetcher` module to retrieve a list of all Signpost articles published in the specified date range. This returns a dictionary with basica article info like dates and section names.
+* Iterates through every article entry and makes an API call to retrieve the Wikipedia page HTML.
+* Parses the page with BeautifulSoup to extract the article headline and author list. Cleans up the author string into a list of usernames.
+* Adds the title and author list to each article's entry in the dictionary.
+### Output
+* Final updated dictionary, containing titles and authors for every article, is saved to a JSON file named `<year>-metadata.txt`.
+
+## viewfetcher.py
+Retrieves daily pageview data for Signpost articles from the Wikimedia REST API.  
+### Arguments  
+`year`  
+The start and end year to fetch views for. If not provided, defaults to the current year.
+### What it does
+* Use `article_fetcher` module to get a list of all Signpost articles in the specified date range.
+* Iterate through every article and construct a URL to query the pageview API (with the `/pageviews/per-article/en.wikipedia/all-access/user/{article-title}` endpoint)
+* Parse the API response and extract view counts for the following ranges: 
+ 7 days (`d007`), 15 days (`d015`), 30 days (`d030`), 60 days (`d060`), 90 days (`d090`), 120 days (`d120`), and 180 days (`d180`)
+* Adds the views dictionary to each article's entry.
+### Output
+Updated article info with views is saved to a JSON file named `<year>-views.txt`.
+
+## combiner.py
+Combines data from multiple sources into a single JSON index for articles published in the Wikipedia Signpost in a given year. Used like this:  
+`python3 combiner.py 2023 -f -k`
+### Arguments 
+`year` (required): The year to generate the combined index for, passed as an integer.  
+`-f` / `--force` (optional): Force update metadata even if fields already exist.  
+`-k` / `--keeptitles` (optional): When updating headlines (in indices) from metadata (in articles), keep existing titles if present rather than overwriting.  
+### What it does
+* Retrieves raw index data for the given year from the Lua indices, using the `lua_wrangler` module. This contains basic metadata like titles, dates, etc.
+* Retrieves a full list of Signpost articles for the given year, using the `article_fetcher` module: this uses PrefixIndex, and can catch things that aren't in the indices. Adds anything that was missing.
+* Optionally, updates the Lua data with additional metadata (like authors and tags) from a metadata file. This can be forced to overwrite existing data.
+* Optionally, integrates page view statistics into the index by matching Lua entries to view data (which you need to have obtained using `viewfetcher.py`) and adding a views field.
+### Output
+`combined/combine-<year>.json`: The final combined index with all data, as JSON.  
+`combined/lua-<year>.txt`: The combined index formatted as a Lua table, for import into Lua environments.
+
+## uploader.py 
+`python3 uploader.py [source_file] [page_name] [summary]`  
+If invoked on its own, this program will `upload()` using the supplied command-line arguments (all strings). 
+### Arguments
+`source_file`  
+Path to a file you want to upload, which will be parsed as plain text.  
+`page_name`  
+Destination page on the English Wikipedia. Make sure this isn't something stupid!  
+`summary` (optional)  
+User-defined edit summary. If supplied, this must not contain any spaces.
+
+If no upload arguments are supplied, it will just print this help message and exit.
+### What it does
+`upload(source_file, page_name, summary)`  
+Retrieves `source_file` and uploads it to `page_name`.  
+Uses authentication details from `cfg/login.txt`.  
+Auth details should be formatted like this:
+> DogBot@General_woofing_tasks  
+> asdjkflh23kj4lh789ghasdlrth34978  
+
+Default summary is "`Wegweiser V{weg_ver.str()}`" (which it will append to user-defined summaries).
+  
+`upload_str(source, page_name, summary)`  
+Same as `upload()`, but just uses whatever string you pass into it as `source` rather than trying to open a file.
+
+# Validation scripts
+## metadata_statisticizer.py
+Gathers metadata from Signpost article indices across all years and generates statistics about tag usage and author contributions over time.  
+Takes no command line arguments.
+* Retrieve Lua index data for every year from 2005 to the current year using `lua_wrangler`.
+* Iterate through the index for each year, and count:
+ Number of articles tagged with each tag
+ Date of most recent usage for each tag
+ Number of articles written by each author
+ Date of most recent article for each author
+* Output the tag and author statistics as two TSV files:
+ Authors: `author`, `count`, `most recent date`  
+ Tags: `tag`, `count`, `most recent date`  
+* Convert the TSV files into wiki tables using the `tsv_to_wikitable` module.
+* Upload the tables to Wikipedia in standard locations:
+ Authors: `Wikipedia:Wikipedia Signpost/Statistics/Authors/Table`
+ Tags: `Wikipedia:Wikipedia Signpost/Statistics/Tags/Table`
+* Also write the tables to disk at:
+ Authors: `data/statisticized-auth.txt`com
+ Tags: `data/statisticized-tags.txt`
+
+## validator.py
+Parses all Signpost article index data (encompassing all years), validates data for completeness, and compiles a report on missing or incomplete data, which it stores to `data/validate.txt` and uploads to the wiki.  
+Takes no command line arguments.  
+* Retrieve Lua index data for every year from 2005 to the current year using `lua_wrangler`.
+* Iterate through the index for each year, and count how many entries have values present for key metadata fields like `title`, `authors`, `tags`, etc.
+* Saves totals for each field to a validation results dictionary containing:  
+  Year  
+  Number of index entries  
+  Count of entries with each metadata field present  
+* Also compiles a list of entries missing each field.
+* Outputs the validation results as JSON, and formats it into a wikitext table.
+* Outputs the list of entries missing data as a series of subheadings with links to individual items.
+* Uploads the table and missing entries list, using `uploader`, to `Wikipedia:Wikipedia_Signpost/Technical/Index_validation`.
+
+# Utility scripts
+
+## mass_tagger.py
 This script is for mass-tagging of articles whose subpages match a mask.
 That is to say, if you want to tag all "Arbitration report" articles with
 "arbitrationreport", or whatever.  
@@ -48,132 +176,60 @@ This is done by specifying the fourth parameter.
 Like this:
 `> python3 mass_tagger.py 2005 nocat acejan2006 mass_tag.txt`
 
-## purger.py
-## tsv_to_wikitable.py
-
-## lua_serializer.py
-Serializes a Python object to a Lua table.  
-**Arguments:**  
-`obj` (number, int, float, str, dict, list)  
-The object to serialize.  
-`indent` (str, optional)  
-The string to indent with, e.g. "\t" or "  ".  
-`indent_level` (int, optional)  
-The initial indentation level.  
-`min_single_line_indent_level` (int, optional)  
-At this indentation level or above, tables will be formatted on a single line.  
-`table_sort_key` (Callable, optional) 
-A key function with which to sort keys of Lua tables. If not specified, the table is not sorted. For details of key functions, see https://docs.python.org/3/howto/sorting.html#key-functions.
-
-**Returns:**  
-`string`  
-A serialized Lua data table string.
-
-## uploader.py
-> Has two functions.
-
-`upload(source_file, page_name, summary)`
-
-  Retrieves source_file and uploads it to page_name.
-  
-  Uses authentication details from cfg/login.txt
-  
-  Auth details should be formatted like this:
-> DogBot@General_woofing_tasks
-
-> asdjkflh23kj4lh789ghasdlrth34978
-
-  Default summary is `Wegweiser V{weg_ver.str()}`.
-  
-`upload_str(source, page_name, summary)`
-
-  Same as upload(), but just uses whatever string you pass into it as 'source'.
-
-If invoked by its own, this program will upload whatever is passed to it using this format:
-
-`python3 uploader.py [source_file] [page_name]`
-
-If no upload arguments are supplied, it will just print this message and exit.
-
-
-## mass_tagger_list.py
-
-## metadata_fetcher.py
-Retrieves and adds metadata, like titles and authors, to Signpost article entries for a given date range.
-
-Arguments:
-> year (optional): The start and end year to fetch metadata for. If not provided, defaults to the current year.
-
-What it does:
-- Uses the `article_fetcher` module to retrieve a list of all Signpost articles published in the specified date range. This returns a dictionary with basica article info like dates and section names.
-- Iterates through every article entry and makes an API call to retrieve the Wikipedia page HTML.
-- Parses the page with BeautifulSoup to extract the article headline and author list. Cleans up the author string into a list of usernames.
-- Adds the title and author list to each article's entry in the dictionary.
-- Saves the final updated dictionary containing titles and authors for every article to a JSON file named <year>-metadata.txt.
-## viewfetcher.py
-## combiner.py
-Combines data from multiple sources into a single JSON index for articles published in the Wikipedia Signpost in a given year. Used like this:
->  python3 combiner.py 2023 -f -k
-
-Arguments:
-> year (required): The year to generate the combined index for, passed as an integer.
-> -f/--force (optional): Force update metadata even if fields already exist.
-> -k/--keeptitles (optional): When updating titles from metadata, keep existing titles if present rather than overwriting.
-
-What it does:
-- Retrieves raw index data for the given year from the Lua indices, using the `lua_wrangler` module. This contains basic metadata like titles, dates, etc.
-- Retrieves a full list of Signpost articles for the given year, using the `article_fetcher` module: this uses PrefixIndex, and can catch things that aren't in the indices. Adds anything that was missing.
-- Optionally, updates the Lua data with additional metadata (like authors and tags) from a metadata file. This can be forced to overwrite existing data.
-- Optionally, integrates page view statistics into the index by matching Lua entries to view data (which you need to have obtained using `viewfetcher.py`) and adding a views field.
-
-Finally, it outputs two files:
-
-> combined/combine-<year>.json: The final combined JSON index with all data.
-> combined/lua-<year>.txt: The combined index formatted as a Lua table, for import into Lua environments.
-
-
-## metadata_statisticizer.py
-
-## validator.py
-
-
-# Utility scripts
-
 ## mass_retagger.py
 Aliases tags in the indices. Usage is like this:  
 `python3 mass_retagger.py badtag goodtag`  
 Will apply default aliases (as specified in Module:Signpost/aliases) if invoked with the argument `alias`:  
 `python3 mass_retagger.py alias`  
-Can also be used to delete tags by providing "delete" as a third argument:  
+Can also be used to delete tags by providing "delete" as a third argument (second argument will be ignored):  
 `python3 mass_retagger.py badtag blahblahblah delete`
 
 
 # Internals
-Scripts that are called internally; there is typically not a reason to invoke these from the terminal, but if you want to, you can.
+Scripts that are called internally; there isn't a whole lot of point in calling them directly but it's possible.
 ## weg_ver.py
-Stores software version and user-agent headers for the bot. 
+Returns software version (`str()`) and user-agent headers (`headers()`) for the bot.
+
+## article_fetcher.py
+Queries the Wikipedia API to retrieve a list of all Signpost articles published within a given date range and return it as a dict or an array. It has one main callable function:
+> `fetch(year_start, year_end, month_range=13, format="dict")`
+### Arguments
+`year_start` (int)  
+Earliest year to include
+`year_end` (int)  
+Most recent year to include
+`month_range` (int)  
+Number of months to query per year (defaults to full year)
+`format` (str)  
+Output format, either "`dict`" or "`array`"
+### What it does
+* Constructs a series of API query URLs to fetch article titles from the specified date range, month-by-month. Requests data from the `allpages` module.  
+ * Technically, this is limited -- to five hundred articles in one month. This is very unlikely to ever matter; even if the Signpost published every single day and had ten articles per issue, there would be no more than 310 articles in a month. But it is worth noting that if, in the future, something really bizarre happens, the limit may need to be increased.*
+* Calls each API URL and extracts the returned list of article titles.  
+* Parses each page name to extract the issue date and article department. This does *not* involve retrieving or parsing the actual text of the page.
+### Output
+Returns the article data in one of two formats:
+* `format="dict"`: A nested dictionary with year > issue date > article metadata
+* `format="array"`: A simple ordered list of article titles.
+
 ## cat_fetcher.py
-> This file is usually not run on its own!
+Utility for getting lists of pages in Wikipedia categories.  Has one function.  
 
-cat_fetcher:
-> fetch(cat): retrieves members of Category:Whatever,
-  and returns it as an array of page names.
-  Limited to 500."
-  Optional parameter 'complete=True' will return
-  an array of three-item dicts, with keys
-  'pageid', 'ns' and 'title'.
-> main (not called from any other script):")
-  Prints this message,
-  fetches whatever cat you give as an arg,
-  and exits.
+`fetch(cat)`  
+Retrieves members of Category:`cat`, and returns it as an array of page names. Limited to 500.  
+Optional parameter `complete=True` will return an array of three-item dicts, with keys `pageid`, `ns` and `title`.   
+
+`main` (not called from any other script; executes if you run cat_fetcher.py from the command line)  
+Prints this message, `fetch`es whatever `cat` you give as an arg, and exits.
+
 ## lua_wrangler.py
-> This file is usually not run on its own!
+Retrieves Lua tables from web and converts them into Python.
 
-lua_wrangler.py has several functions:
-> fetch(year): retrieves wikitext of Module:Signpost/index/year,
-  converts Lua table to a Python object, and returns it.
-> luaify(obj): serializes a Python object to a Lua table.
-> main (not called from any other script):
-  print this message, retrieve and print index for CURRENTYEAR,
-  and (optionally) save it to an output file, viz.
-  "python3 lua_wrangler.py output.txt" or whatevre.
+`fetch(year)`  
+Retrieves wikitext of Module:Signpost/index/year,  converts Lua table to a Python object, and returns it.
+
+`luaify(obj)`  
+Serializes a Python object to a Lua table.  
+
+`main` (not called from any other script; executes if you run lua_wrangler.py from the command line)  
+Print this message, retrieve and print index for the current year, and (optionally) save it to an output file, e.g. "`python3 lua_wrangler.py output.txt`" or whatever.
