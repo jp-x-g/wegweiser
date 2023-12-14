@@ -8,7 +8,6 @@ import sys
 import lua_wrangler
 import article_fetcher
 import cat_fetcher
-# Usage: python3 combiner.py 2016
 
 signpost = "Wikipedia Signpost"
 

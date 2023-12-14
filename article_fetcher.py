@@ -8,14 +8,6 @@ import sys
 import weg_ver
 # python -m pip install --upgrade luadata
 
-# Normal usage looks like:
-# python3 viewfetcher.py 2017 180
-# or:
-# python3 viewfetcher.py 2017
-# or:
-# python3 viewfetcher.py
-# (returns for current year)
-
 # This is a secret tool that will come in handy later.
 signpost = "Wikipedia Signpost"
 

@@ -1,6 +1,4 @@
 def updateArrayOld(baseArray, updateArray):
-    # My previous version was O(n^2), but this one is O(n).
-    # Thanks, ChatGPT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     updateDict = {}
     for item in updateArray:
         key = (item['date'], item['subpage'])

@@ -103,13 +103,33 @@ if len(sys.argv) > 3:
 print(f"Attempting to combine for {combine_year}.")
 
 lua_json = lua_wrangler.fetch(combine_year)
+# This will download the big ol' Lua index for that year. It will output a series of entries like:
+
+# {
+#  'date': '2023-01-01',
+#  'subpage': 'Arbitration report',
+#  'title': 'Arbitration Committee Election 2022',
+#  'authors': ['Kudpung'],
+#  'tags': ['arbcom', 'arbcomelection', 'arbitrationreport'],
+#  'views': {
+#            'd007': 482,
+#            'd015': 586,
+#            'd030': 608,
+#            'd060': 615,
+#            'd090': 632,
+#            'd120': 641,
+#            'd180': 702
+#           }
+# }
+
+# Now, this isn't CANONICAL! I'm writing this in December 2023 -- you, dear future person,
+# may be processing indices with more or different fields. It might be different. Check it!
+
 print(f"Fetched Lua and wrangled into JSON... Items: {len(lua_json)}")
 
 #print(lua_json)
 #print(json.dumps(lua_json, indent=2))
 #print(lua_json[0])
-
-
 
 ###############################################################################
 # Below is the part that adds articles to indices that lack them.

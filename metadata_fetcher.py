@@ -11,19 +11,10 @@ from bs4 import BeautifulSoup
 import weg_ver
 headers = weg_ver.headers()
 
-# Normal usage looks like:
-# python3 viewfetcher.py 2017
-# or: 
-# python3 viewfetcher.py
-# (returns for current year)
-
-
 # This is a secret tool that will come in handy later.
 signpost = "Wikipedia Signpost"
 
-
 current_year = int(datetime.datetime.now().year)
-
 
 month_range = 13
 year_start  = current_year
@@ -132,6 +123,8 @@ for year in all_articles:
       # "By Tom, Dick & Harry"
       if authors[:3] == "By ":
         authors = authors[3:]
+      if authors[:3] == "by ":
+        authors = authors[3:]
       # "Tom, Dick, and Harry"
       # "Tom, Dick and Harry"
       authors = authors.replace(" & ", ", ")
@@ -155,9 +148,6 @@ for year in all_articles:
             authors[i] = authors[i][:-1]
       article["authors"] = authors
       print(f"Authors: {str(authors)}")
-
-
-      
 
 print(all_articles)
 
