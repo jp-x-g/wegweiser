@@ -107,14 +107,15 @@ def fetch(year_start=current_year, year_end=current_year, month_range=13, mode="
     # Now we can go through and pick out individual 
 
     for year in all_articles:
-      for article in all_articles[year]:
-        pagename = "Wikipedia:" + signpost + "/" + article["date"] + "/" + article["subpage"]
+      #for article in all_articles[year]:
+      for a in range(0, len(all_articles[year])):
+        pagename = "Wikipedia:" + signpost + "/" + all_articles[year][a]["date"] + "/" + all_articles[year][a]["subpage"]
           # Sound familiar? Yeah, it's because we have to fish the page back OUT OF THE STEW.
         if pagename in article_stew:
           # print("Happiness!")
           print(pagename)
-          parsed = parse_hell(article_stew[pagename], article["date"], article["subpage"])
-          article = parsed[0]
+          parsed = parse_hell(article_stew[pagename], all_articles[year][a]["date"], all_articles[year][a]["subpage"])
+          all_articles[year][a] = parsed[0]
           errors += parsed[1]
         else:
           errors += f"\nCouldn't find title  : {pagename}"
@@ -126,30 +127,49 @@ def fetch(year_start=current_year, year_end=current_year, month_range=13, mode="
 
 def parse_hell(text, date, subpage):
   pagename = "Wikipedia:" + signpost + "/" + date + "/" + subpage
-  dict = {
-          "date"   : date,
-          "subpage": subpage,
-          "title"  : "unparsed",
-          "authors": ["unparsed"]
+  datafields = {
+          "date"      : date,
+          "subpage"   : subpage,
+          "title"     : "unparsed",
+          "authors"   : ["unparsed"],
+          "subheading": ""
           }
   errors = ""
   w = mwparserfromhell.parse(text)
   ts = w.filter_templates()
   for t in ts:
     # print(str(t.name))
-    if str(t.name).strip() == "Wikipedia:Wikipedia Signpost/Templates/RSS description":
-      print("subhead = " + str(t.get("1").value))
-    elif (str(t.name).strip() == "Wikipedia:Wikipedia Signpost/Templates/Signpost-article-header-v2") or (str(t.name).strip() == "Wikipedia:Signpost/Template:Signpost-article-start"):
-      print("title   = " + str(t.get("1").value))
+    if (str(t.name).strip() == "Wikipedia:Wikipedia Signpost/Templates/Signpost-article-header-v2") or (str(t.name).strip() == "Wikipedia:Signpost/Template:Signpost-article-start"):
+      # print("title   = " + str(t.get("1").value))
+      hed = str(t.get("1").value)
+      hed = hed.replace("\n", "").strip()
+      if(hed[0:5]) == "{{{1|":
+        hed = hed[5:]
+      if(hed[-3:]) == "}}}":
+        hed = hed[:-3]
+      # Change "{{{1|Worthwhile Canadian Initiative}}}" to "Worthwhile Canadian Initiative".
+      datafields["title"] = hed
+
       authors = str(t.get("2").value.strip_code())
       cln = clean_authors(str(authors), pagename)
-      dict["authors"] = cln[0]
+      datafields["authors"] = cln[0]
       errors += cln[1]
-      print("authors = " + str(dict["authors"]))
+      # print("authors = " + str(datafields["authors"]))
       if ("{{u" in str(t.get("2").value)) or ("{{U" in str(t.get("2").value)):
         errors += "\nTemplate:U for author: " + pagename
 
-  return(dict, errors)
+    elif str(t.name).strip() == "Wikipedia:Wikipedia Signpost/Templates/RSS description":
+      #print("subhead = " + str(t.get("1").value))
+      subhed = str(t.get("1").value)
+      subhed = subhed.replace(str(datafields["title"]) + ": ", "")
+      subhed = subhed.replace(str(datafields["title"]) + ":", "")
+      subhed = subhed.replace(str(datafields["title"]), "")
+      # This bewildering series of three lines fixes an occasional issue you see in some of the RSS description templates:
+      # the article title will be included in them, and then the 
+      datafields["subheading"] = subhed
+  print(datafields)
+
+  return(datafields, errors)
 
 def clean_authors(authors, pagename="unspecified"):
   # At this point, if there are any authors at all...
@@ -232,8 +252,6 @@ def obtain(article):
           # February 2017 and before.
           article["title"] = i.text
           print(f"Title: {article['title']}")
-          print(f"\nTitle unparseable for: Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}")
-          errors += f"\nTitle unparseable for: Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
       except Exception as err:
         print(f"Title error: {err}")
         print(f"\nTitle error          : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}")
@@ -319,6 +337,8 @@ if (__name__ == "__main__"):
     print(f"Saving to {i}")
     save_name = str(i) + "-metadata.txt"
     data = fetch(year_start=i, year_end=i, month_range=month_range, mode=mode)
+    #print(json.dumps(data[0], indent=2))
+    #exit()
     
     f = open("metadata/" + save_name, "w")
     f.write(json.dumps(data[0], indent=2))
