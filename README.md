@@ -1,6 +1,8 @@
-# wegweiser
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jp-x-g/wegweiser/main/wegweiser-logo.jpg" alt="Wegweiser logo" width="400" height="400">
+</p>
 
-Various scripts to build and maintain Lua indices for Signpost data.
+Various scripts to build and maintain Lua indices and article data for the Signpost.
 
 These scripts are made to be modular. The general architecture of the *Signpost*, which Wegweiser's operation is based on, has a few central principles:
 * **Article pages are the canonical origin of information.**  
@@ -30,11 +32,6 @@ Update indices with pageviews for 2023: fetch metadata, fetch pageview counts, c
 # Individual workflow scripts
 Scripts that are part of the main workflow of the suite: 
 
-## json-tabler.py
-
-## purger.py
-## tsv_to_wikitable.py
-
 ## lua_serializer.py
 Serializes a Python object to a Lua table.  
 ### Arguments  
@@ -52,7 +49,6 @@ At this indentation level or above, tables will be formatted on a single line.
 
 `table_sort_key` (Callable, optional)  
 A key function with which to sort keys of Lua tables. If not specified, the table is not sorted. For details of key functions, see https://docs.python.org/3/howto/sorting.html#key-functions.
-
 ### Output  
 `string`  
 Returns a serialized Lua data table string.
@@ -233,3 +229,21 @@ Serializes a Python object to a Lua table.
 
 `main` (not called from any other script; executes if you run lua_wrangler.py from the command line)  
 Print this message, retrieve and print index for the current year, and (optionally) save it to an output file, e.g. "`python3 lua_wrangler.py output.txt`" or whatever.
+
+## tsv_to_wikitable.py
+Converts TSVs to formatted tables in wikitext markup.
+
+`process(data, headers)`  
+Omits file processing, and simply parses `data` (a string) into a wikitable (using the optional `headers` array, if present, for column headings). Returns a string of the formatted wikitable.  
+
+`convert(input_file, output_file, headers)`  
+Converts `input_file` (default `input.txt`) to wikitable, using `process()`, with optional `headers` array for column headings. Writes result to `output_file` (default `output.txt`).
+
+`main` (not called from any other script; executes if you run lua_wrangler.py from the command line)  
+Invoked like this: `python3 tsv_to_wikitable.py uglytext.txt nicetable.txt`  
+Supplying one argument (just the input file) will write, by default, to `output.txt`.  
+Supplying no arguments will parse `input.txt` and write to `output.txt`.
+
+## purger.py
+
+Purges a list of Wikipedia page titles, 

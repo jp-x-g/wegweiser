@@ -22,9 +22,7 @@ def convert(input="input.txt", output="output.txt", headers=[]):
 
 def process(data, headers=[]):
 	
-	# For processing words only. Converts linebreaks to spaces and strips all alphanumerics.
 	data_len = len(data)
-	# This should make it do words instead of letters.
 	data = data.split("\n")
 	
 	print("Processing input: " + str(data_len) + " chars" + ", " + str(len(data)) + " items")
