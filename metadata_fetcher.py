@@ -132,8 +132,9 @@ def parse_hell(text, date, subpage):
           "subpage"   : subpage,
           "title"     : "unparsed",
           "authors"   : ["unparsed"],
-          "subheading": ""
+          "subhead": ""          
           }
+
   errors = ""
   w = mwparserfromhell.parse(text)
   ts = w.filter_templates()
@@ -142,13 +143,15 @@ def parse_hell(text, date, subpage):
     if (str(t.name).strip() == "Wikipedia:Wikipedia Signpost/Templates/Signpost-article-header-v2") or (str(t.name).strip() == "Wikipedia:Signpost/Template:Signpost-article-start"):
       # print("title   = " + str(t.get("1").value))
       hed = str(t.get("1").value)
-      hed = hed.replace("\n", "").strip()
+      if "\t" in hed:
+        errors += "\nTab char in headline : " + pagename
+      hed = dewhiten(hed)
       if(hed[0:5]) == "{{{1|":
         hed = hed[5:]
       if(hed[-3:]) == "}}}":
         hed = hed[:-3]
       # Change "{{{1|Worthwhile Canadian Initiative}}}" to "Worthwhile Canadian Initiative".
-      datafields["title"] = hed
+      datafields["title"] = dewhiten(hed)
 
       authors = str(t.get("2").value.strip_code())
       cln = clean_authors(str(authors), pagename)
@@ -157,16 +160,42 @@ def parse_hell(text, date, subpage):
       # print("authors = " + str(datafields["authors"]))
       if ("{{u" in str(t.get("2").value)) or ("{{U" in str(t.get("2").value)):
         errors += "\nTemplate:U for author: " + pagename
+      # TODO: Write something to parse out all of the weird userlink templates:
+      # {{u|asdf}}, {{U|asdf}}, {{ul|asdf}}, {{noping|asdf}}, {{np|asdf}}
 
     elif str(t.name).strip() == "Wikipedia:Wikipedia Signpost/Templates/RSS description":
       #print("subhead = " + str(t.get("1").value))
       subhed = str(t.get("1").value)
-      subhed = subhed.replace(str(datafields["title"]) + ": ", "")
-      subhed = subhed.replace(str(datafields["title"]) + ":", "")
-      subhed = subhed.replace(str(datafields["title"]), "")
-      # This bewildering series of three lines fixes an occasional issue you see in some of the RSS description templates:
-      # the article title will be included in them, and then the 
-      datafields["subheading"] = subhed
+      datafields["subhead"] = subhed
+
+
+  # Clean out subheading.
+
+  # An occasional issue you get using RSS templates for subheadings is that...
+  # sometimes the article title will be included in them before the subhead.
+
+  sh = dewhiten(str(datafields["subhead"]))
+  ti = dewhiten(str(datafields["title"]))
+
+  if (ti in sh):
+    if (sh.find(ti) == 0):
+      sh = sh.replace(ti + ": ", "")
+      sh = sh.replace(ti + ":", "")
+      sh = sh.replace(ti + " :", "")
+      sh = sh.replace(ti, "")
+
+  ti = ti.replace("'''''", "").replace("'''", "").replace("''", "")
+  # Strange rare edge case where something is bold/italic in the title but not the subheading.
+
+  if (ti in sh):
+    if (sh.find(ti) == 0):
+      sh = sh.replace(ti + ": ", "")
+      sh = sh.replace(ti + ":", "")
+      sh = sh.replace(ti + " :", "")
+      sh = sh.replace(ti, "")
+
+  datafields["subhead"] = dewhiten(sh)
+
   print(datafields)
 
   return(datafields, errors)
@@ -181,10 +210,12 @@ def clean_authors(authors, pagename="unspecified"):
   try:
     if "\n" in authors:
       errors += f"\nLine break in author : {pagename}"
-  
-    if authors[:3] == "By ":
-      authors = authors[3:]
-    if authors[:3] == "by ":
+    if "\t" in authors:
+      errors += f"\nTab char in authors  : {pagename}"
+
+    authors = dewhiten(authors)
+
+    if authors[:3].lower() == "by ":
       authors = authors[3:]
     # "Tom, Dick, and Harry"
     # "Tom, Dick and Harry"
@@ -197,16 +228,13 @@ def clean_authors(authors, pagename="unspecified"):
     # We've now split it into an array:
     # ["Tom", "Dick", "Harry"]
     for i in range(0, len(authors)):
+      authors[i] = dewhiten(authors[i])
       if authors[i] == "":
         authors[i] = "none"
       else:
-        # Clean out trailing spaces and gobbledygook.
-        authors[i] = authors[i].replace("  ", " ")
-        if authors[i][0] == " ":
-          authors[i] = authors[i][1:]
-        if authors[i][-1] == " ":
-          authors[i] = authors[i][:-1]
-        if authors[i][-1] == ".":
+        # Clean out trailing period.
+        if authors[i][-1] in [".", ","]:
+          errors += f"\nTrail punct in auths : {pagename}"
           authors[i] = authors[i][:-1]
     return(authors, errors)
   except Exception as err:
@@ -214,6 +242,13 @@ def clean_authors(authors, pagename="unspecified"):
     errors += f"\nBIG author error     : {pagename}"
     authors = "ERROR"
     return(authors, errors)
+
+
+def dewhiten(st):
+  st = st.replace("\t", " ").replace("\n", " ").strip()
+  while "  " in st:
+    st = st.replace("  ", " ")
+  return st.strip()
 
 def obtain(article):
 
