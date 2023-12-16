@@ -16,6 +16,9 @@ signpost = "Wikipedia Signpost"
 current_year = int(datetime.datetime.now().year)
 current_month = datetime.datetime.now().month
 current_day = datetime.datetime.now().day
+current_hour = datetime.datetime.now().hour
+current_minute = datetime.datetime.now().minute
+current_second = datetime.datetime.now().second
 
 def fetch(year_start=current_year, year_end=current_year, month_range=13, mode="html", log_errors=False):
   # This technically takes a range of years as an argument, but for reasons,
@@ -323,7 +326,13 @@ def obtain(article):
   
 
 def log(errors):
-  datestamp = str(current_year) + "-" + str(current_month).zfill(2) + "-" + str(current_day).zfill(2)
+  datestamp = ""
+  datestamp += str(current_year)
+  datestamp += "-" + str(current_month).zfill(2)
+  datestamp += "-" + str(current_day).zfill(2)
+  datestamp += " " + str(current_hour).zfill(2)
+  datestamp += ":" + str(current_minute).zfill(2)
+  datestamp += ":" + str(current_second).zfill(2)
   f = open("data/metadata-errors-" + datestamp + ".log", "w")
   f.write(errors)
   f.close()
@@ -344,6 +353,54 @@ if (__name__ == "__main__"):
   #year_end    = 2022
   #days        = 180
 
+  if ("help" in sys.argv) or ("-h" in sys.argv) or ("--help" in sys.argv):
+    print("metadata_fetcher.py")
+    print("   ")
+    print("   Retrieves and adds metadata, like titles and authors, to")
+    print("   Signpost article entries for a given date range.")
+    print("   ")
+    print("   Uses the article_fetcher module to retrieve a list of")
+    print("   all Signpost articles published in the specified date")
+    print("   range. This returns a dictionary with basic article info")
+    print("   like dates and section names. Then it iterates through")
+    print("   every article and makes batched API calls to retrieve the")
+    print("   wikitext from the Revisions endpoint (50 per request).")
+    print("   Parses the page with mwparserfromhell to extract the")
+    print("   article headline, author list, subheadline, et cetera.")
+    print("   Cleans up the author string into a list of usernames.")
+    print("   Adds the title and author list to each article's entry")
+    print("   in a JSON dictionary compatible with Signpost Lua indices")
+    print("   and saves it to a JSON file named `<year>-metadata.txt`.")
+    print("   ")
+    print("   Can be called directly from the command line with format:")
+    print("python3 metadata_fetcher.py start[-end] [-html] [-d]")
+    print("   All of the following are valid ways to invoke the script:")
+    print("python3 metadata_fetcher.py 2017")
+    print("python3 metadata_fetcher.py 2011-2020")
+    print("python3 metadata_fetcher.py 2005-2005 --debug --html")
+    print("   Arguments:")
+    print("   ")
+    print("startyear, endyear (both optional)")
+    print("   Year to fetch metadata for. It can be one year, or a")
+    print("   range of years (inclusive) with the start and end")
+    print("   point separated by a hyphen. If no year is provided,")
+    print("   script defaults to the current year.")
+    print("-d, --debug")
+    print("   Logs errors (bad characters in metadata fields,")
+    print("   unparseable pages, etc) to a file located at")
+    print("   data/metadata-errors-YYYY-MM-DD HH:MM:SS.log.")
+    print("-html, --html")
+    print("   Uses old retrieval method (parses HTML pages with")
+    print("   BeautifulSoup instead of wikitext with mwparserfromhell).")
+    print("   This doesn't allow advanced metadata retrieval, and")
+    print("   doesn't support page batching, so it takes dozens of")
+    print("   times longer and produces worse output. Retained as a")
+    print("   fallback in case bugs prevent using the default parser.")
+    print("-h, --help")
+    print("   Prints this help message and exits. ")
+
+
+
   if len(sys.argv) > 1:
     if "-" in sys.argv[1]:
       year_start = int(sys.argv[1].split("-")[0])
@@ -357,11 +414,11 @@ if (__name__ == "__main__"):
     print("The Signpost started on January 10, 2005!")
     exit()
 
-  mode = "html"
+  mode = "hell"
   debug = False
 
-  if ("-p" in sys.argv) or ("--parser" in sys.argv):
-    mode = "hell"
+  if ("-html" in sys.argv) or ("--html" in sys.argv):
+    mode = "html"
   if ("-d" in sys.argv) or ("--debug" in sys.argv):
     debug = True
 

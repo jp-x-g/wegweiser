@@ -12,15 +12,33 @@ While the articles are the origin of truth with respect to data, this data is no
 The *Signpost* module indices are the location, downstream of the data origin, where data is stored in an accessible, machine-readable, validated format.  
 Any page that is using this data should be drawing it straight from the indices and parsed dynamically using a module or similar means. Data should not be drawn out of the indices and used to generate other pages (i.e. individual issue pages that redundantly store the date, department name, headline and subhead for each article; individual byline pages that redundantly list an author's stories; etc).  
 
-Perhaps I am rambling here, but I hope this illustrates an idea of how data is meant to flow, and what Wegweiser is meant to do. It consists of a few categories of scripts:
-* **Workflow scripts**  
+Perhaps I am rambling here, but I hope this illustrates an idea of how data is meant to flow, and what Wegweiser is meant to do. It consists of a few categories of scripts.
+# Table of contents
+* [**Workflow scripts**](#Workflow-scripts)  
 These are part of the normal operation of Wegweiser, to wit: querying PrefixIndexes, locating article pages, extracting metadata from article pages, querying the pageview API for view counts on the articles, reading from the module indices, integrating its information with what's already there, and saving it to wiki. Workflow scripts do not modify pages other than the module indices.
+    * [metadata_fetcher.py](#metadata_fetcher.py)
+    * [viewfetcher.py](#viewfetcher.py)
+    * [combiner.py](#combiner.py)
+    * [uploader.py](#uploader.py)  
 
-* **Utility scripts**  
+* [**Validation scripts**](#Validation-scripts)  
+These analyze index data, report errors (including missing data), and compile statistics.
+    * [metadata_statisticizer.py](#metadata_statisticizer.py)
+    * [validator.py](#validator.py)    
+
+* [**Utility scripts**](#Utility-scripts)  
 These are to assist in manual maintenance tasks, like refactoring, updating or modifying articles or metadata. For example, mass alterations can be made to articles' tags, replacing one tag with another across the database (or deleting it altogether). There are also scripts for doing maintenance work, like extracting lists of pages from categories.
+    * [mass_tagger.py](#mass_tagger.py)
+    * [mass_retagger.py](#mass_retagger.py)    
 
-* **Internal scripts**  
+* [**Internal scripts**](#Internal-scripts)  
 These are scripts that are of limited use to the end user, and are called primarily by other scripts in the course of carrying out their favorite tasks. If you're trying to implement or extend Wegweiser, these are useful.
+    * [weg_ver.py](#weg_ver.py)
+    * [article_fetcher.py](#article_fetcher.py)
+    * [cat_fetcher.py](#cat_fetcher.py)
+    * [lua_wrangler.py](#lua_wrangler.py)
+    * [lua_serializer.py](#lua_serializer.py)
+    * [tsv_to_wikitable.py](#tsv_to_wikitable.py)
 
 # Typical workflows
 Update indices from 2011: fetch metadata, combine with existing information, upload to the module index year page, and then compute metadata statistics.
@@ -29,42 +47,38 @@ Update indices from 2011: fetch metadata, combine with existing information, upl
 Update indices with pageviews for 2023: fetch metadata, fetch pageview counts, combine with existing information, and upload to the module index year page.
 `python3 metadata_fetcher.py 2023;python3 viewfetcher.py 2023; python3 combiner.py 2023 -f -k;python3 uploader.py combined/lua-2023.txt Module:Signpost/index/2023 Update`
 
-# Individual workflow scripts
-Scripts that are part of the main workflow of the suite: 
-
-## lua_serializer.py
-Serializes a Python object to a Lua table.  
-### Arguments  
-`obj` (number, int, float, str, dict, list)  
-The object to serialize.
-
-`indent` (str, optional)  
-The string to indent with, e.g. `\t` or `  `.
-
-`indent_level` (int, optional)  
-The initial indentation level.
-
-`min_single_line_indent_level` (int, optional)  
-At this indentation level or above, tables will be formatted on a single line.
-
-`table_sort_key` (Callable, optional)  
-A key function with which to sort keys of Lua tables. If not specified, the table is not sorted. For details of key functions, see https://docs.python.org/3/howto/sorting.html#key-functions.
-### Output  
-`string`  
-Returns a serialized Lua data table string.
+# Workflow scripts
+Scripts that are part of the main workflow of the suite.
 
 ## metadata_fetcher.py
-Retrieves and adds metadata, like titles and authors, to Signpost article entries for a given date range.
+Retrieves and adds metadata, like titles and authors, to Signpost article entries for a given date range.  
+Can be called directly from the command line, with the format:  
+`python3 metadata_fetcher.py startyear[-endyear] [-html/--html] [-d/--debug]`  
+All of the following are valid ways to invoke the script:  
+`python3 metadata_fetcher.py 2017`  
+`python3 metadata_fetcher.py 2011-2020`  
+`python3 metadata_fetcher.py 2005-2005 --debug --html`  
 ### Arguments  
-`year` (optional)  
-The start and end year to fetch metadata for. If not provided, defaults to the current year.
+`startyear`, `endyear` (both optional)  
+Year to fetch metadata for. It can be one year, or a range of years (inclusive) with the start and end point separated by a hyphen. If no year is provided, defaults to the current year.   
+`-d`, `--debug`  
+Logs errors (bad characters in metadata fields, unparseable pages, etc) to `data/metadata-errors-YYYY-MM-DD HH:MM:SS.log`.  
+`-html`, `--html`  
+Uses old retrieval method (parses HTML pages with BeautifulSoup instead of wikitext with mwparserfromhell). This doesn't allow advanced metadata retrieval, and doesn't support page batching, so it takes dozens of times longer and produces worse output. Retained as a fallback in case bugs prevent using the default parser.  
+`-b=42`, `--batch=42`  
+Overrides default batch size for wikitext API requests (50) with custom parameter.  
+`-h`, `--help`  
+Prints this help message and exits.  
 ### What it does
-* Uses the `article_fetcher` module to retrieve a list of all Signpost articles published in the specified date range. This returns a dictionary with basica article info like dates and section names.
-* Iterates through every article entry and makes an API call to retrieve the Wikipedia page HTML.
-* Parses the page with BeautifulSoup to extract the article headline and author list. Cleans up the author string into a list of usernames.
-* Adds the title and author list to each article's entry in the dictionary.
+* Uses the `article_fetcher` module to retrieve a list of all Signpost articles published in the specified date range. This returns a dictionary with basic article info like dates and subpage names.
+* Iterates through every article entry and makes an API call to retrieve the wikitext from the Revisions endpoint. These calls are batched to a default of 50 pages per request, the maximum available from that endpoint (API URLs are also limited to a maximum of 8202 characters, including URL params and full percent-encoded titles of each page being requested).
+* Parses the retrieved wikitext with [mwparserfromhell](mwparserfromhell.readthedocs.io/), to extract the article headline, author list, and RSS description (subheading). Cleans up the strings and parses author list into an array.
+* Adds the title, author array, and subheadings to each article's entry in the dictionary.
 ### Output
 * Final updated dictionary, containing titles and authors for every article, is saved to a JSON file named `<year>-metadata.txt`.
+* Optionally, logs errors to `data/metadata-errors-YYYY-MM-DD HH:MM:SS.log`.    
+
+> [*Back to top*](#Table-of-contents)
 
 ## viewfetcher.py
 Retrieves daily pageview data for Signpost articles from the Wikimedia REST API.  
@@ -78,7 +92,9 @@ The start and end year to fetch views for. If not provided, defaults to the curr
  7 days (`d007`), 15 days (`d015`), 30 days (`d030`), 60 days (`d060`), 90 days (`d090`), 120 days (`d120`), and 180 days (`d180`)
 * Adds the views dictionary to each article's entry.
 ### Output
-Updated article info with views is saved to a JSON file named `<year>-views.txt`.
+Updated article info with views is saved to a JSON file named `<year>-views.txt`.  
+
+> [*Back to top*](#Table-of-contents)
 
 ## combiner.py
 Combines data from multiple sources into a single JSON index for articles published in the Wikipedia Signpost in a given year. Used like this:  
@@ -94,7 +110,9 @@ Combines data from multiple sources into a single JSON index for articles publis
 * Optionally, integrates page view statistics into the index by matching Lua entries to view data (which you need to have obtained using `viewfetcher.py`) and adding a views field.
 ### Output
 `combined/combine-<year>.json`: The final combined index with all data, as JSON.  
-`combined/lua-<year>.txt`: The combined index formatted as a Lua table, for import into Lua environments.
+`combined/lua-<year>.txt`: The combined index formatted as a Lua table, for import into Lua environments.  
+
+> [*Back to top*](#Table-of-contents)
 
 ## uploader.py 
 `python3 uploader.py [source_file] [page_name] [summary]`  
@@ -120,6 +138,8 @@ Default summary is "`Wegweiser V{weg_ver.str()}`" (which it will append to user-
   
 `upload_str(source, page_name, summary)`  
 Same as `upload()`, but just uses whatever string you pass into it as `source` rather than trying to open a file.
+  
+> [*Back to top*](#Table-of-contents)
 
 # Validation scripts
 ## metadata_statisticizer.py
@@ -140,7 +160,9 @@ Takes no command line arguments.
  Tags: `Wikipedia:Wikipedia Signpost/Statistics/Tags/Table`
 * Also write the tables to disk at:
  Authors: `data/statisticized-auth.txt`com
- Tags: `data/statisticized-tags.txt`
+ Tags: `data/statisticized-tags.txt`  
+
+> [*Back to top*](#Table-of-contents)
 
 ## validator.py
 Parses all Signpost article index data (encompassing all years), validates data for completeness, and compiles a report on missing or incomplete data, which it stores to `data/validate.txt` and uploads to the wiki.  
@@ -156,7 +178,9 @@ Takes no command line arguments.
 * Outputs the list of entries missing data as a series of subheadings with links to individual items.
 * Uploads the table and missing entries list, using `uploader`, to `Wikipedia:Wikipedia_Signpost/Technical/Index_validation`.
 
-# Utility scripts
+> [*Back to top*](#Table-of-contents)
+
+# Utility scripts  
 
 ## mass_tagger.py
 This script is for mass-tagging of articles whose subpages match a mask.
@@ -170,7 +194,8 @@ Like this:
 It can also just add a tag to every article that's in a certain list.
 This is done by specifying the fourth parameter.
 Like this:
-`> python3 mass_tagger.py 2005 nocat acejan2006 mass_tag.txt`
+`> python3 mass_tagger.py 2005 nocat acejan2006 mass_tag.txt`  
+> [*Back to top*](#Table-of-contents)
 
 ## mass_retagger.py
 Aliases tags in the indices. Usage is like this:  
@@ -180,11 +205,14 @@ Will apply default aliases (as specified in Module:Signpost/aliases) if invoked 
 Can also be used to delete tags by providing "delete" as a third argument (second argument will be ignored):  
 `python3 mass_retagger.py badtag blahblahblah delete`
 
+> [*Back to top*](#Table-of-contents)
 
 # Internals
 Scripts that are called internally; there isn't a whole lot of point in calling them directly but it's possible.
 ## weg_ver.py
-Returns software version (`str()`) and user-agent headers (`headers()`) for the bot.
+Returns software version (`str()`) and user-agent headers (`headers()`) for the bot.  
+
+> [*Back to top*](#Table-of-contents)
 
 ## article_fetcher.py
 Queries the Wikipedia API to retrieve a list of all Signpost articles published within a given date range and return it as a dict or an array. It has one main callable function:
@@ -206,7 +234,9 @@ Output format, either "`dict`" or "`array`"
 ### Output
 Returns the article data in one of two formats:
 * `format="dict"`: A nested dictionary with year > issue date > article metadata
-* `format="array"`: A simple ordered list of article titles.
+* `format="array"`: A simple ordered list of article titles.  
+
+> [*Back to top*](#Table-of-contents)
 
 ## cat_fetcher.py
 Utility for getting lists of pages in Wikipedia categories.  Has one function.  
@@ -216,7 +246,8 @@ Retrieves members of Category:`cat`, and returns it as an array of page names. L
 Optional parameter `complete=True` will return an array of three-item dicts, with keys `pageid`, `ns` and `title`.   
 
 `main` (not called from any other script; executes if you run cat_fetcher.py from the command line)  
-Prints this message, `fetch`es whatever `cat` you give as an arg, and exits.
+Prints this message, `fetch`es whatever `cat` you give as an arg, and exits.  
+> [*Back to top*](#Table-of-contents)
 
 ## lua_wrangler.py
 Retrieves Lua tables from web and converts them into Python.
@@ -228,7 +259,30 @@ Retrieves wikitext of Module:Signpost/index/year,  converts Lua table to a Pytho
 Serializes a Python object to a Lua table.  
 
 `main` (not called from any other script; executes if you run lua_wrangler.py from the command line)  
-Print this message, retrieve and print index for the current year, and (optionally) save it to an output file, e.g. "`python3 lua_wrangler.py output.txt`" or whatever.
+Print this message, retrieve and print index for the current year, and (optionally) save it to an output file, e.g. "`python3 lua_wrangler.py output.txt`" or whatever. 
+> [*Back to top*](#Table-of-contents)
+
+## lua_serializer.py
+Serializes a Python object to a Lua table.  
+### Arguments  
+`obj` (number, int, float, str, dict, list)  
+The object to serialize.
+
+`indent` (str, optional)  
+The string to indent with, e.g. `\t` or `  `.
+
+`indent_level` (int, optional)  
+The initial indentation level.
+
+`min_single_line_indent_level` (int, optional)  
+At this indentation level or above, tables will be formatted on a single line.
+
+`table_sort_key` (Callable, optional)  
+A key function with which to sort keys of Lua tables. If not specified, the table is not sorted. For details of key functions, see https://docs.python.org/3/howto/sorting.html#key-functions.
+### Output  
+`string`  
+Returns a serialized Lua data table string.  
+> [*Back to top*](#Table-of-contents)
 
 ## tsv_to_wikitable.py
 Converts TSVs to formatted tables in wikitext markup.
@@ -243,7 +297,3 @@ Converts `input_file` (default `input.txt`) to wikitable, using `process()`, wit
 Invoked like this: `python3 tsv_to_wikitable.py uglytext.txt nicetable.txt`  
 Supplying one argument (just the input file) will write, by default, to `output.txt`.  
 Supplying no arguments will parse `input.txt` and write to `output.txt`.
-
-## purger.py
-
-Purges a list of Wikipedia page titles, 
