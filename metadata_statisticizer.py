@@ -97,8 +97,8 @@ outputa = tsv_to_wikitable.process(outputa, headers=[f"Author ({str(len(allautho
 outputt = tsv_to_wikitable.process(outputt, headers=[f"Tag ({str(len(alltags))} total)", "#", "Most recent"])
 
 # Now to upload them.
-uploader.upload_str(outputt, "Wikipedia:Wikipedia Signpost/Statistics/Tags/Table", summary=f"Update tag information / Wegweiser V{weg_ver.str()}")
-uploader.upload_str(outputa, "Wikipedia:Wikipedia Signpost/Statistics/Authors/Table", summary=f"Update author information / Wegweiser V{weg_ver.str()}")
+uploader.upload_str(outputt, "Wikipedia:Wikipedia Signpost/Statistics/Tags/Table", summary=f"Update tag information")
+uploader.upload_str(outputa, "Wikipedia:Wikipedia Signpost/Statistics/Authors/Table", summary=f"Update author information")
 
 # Write them to disk as well.
 f = open(tags_path, "w")

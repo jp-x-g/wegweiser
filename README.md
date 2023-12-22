@@ -51,7 +51,7 @@ Update indices with pageviews for 2023: fetch metadata, fetch pageview counts, c
 Scripts that are part of the main workflow of the suite.
 
 ## metadata_fetcher.py
-Retrieves and adds metadata, like titles and authors, to Signpost article entries for a given date range.  
+Retrieves and adds metadata, like titles and authors, to Signpost article entries for a given date range (which is input for combiner.py).  
 Can be called directly from the command line, with the format:  
 `python3 metadata_fetcher.py startyear[-endyear] [-html/--html] [-d/--debug]`  
 All of the following are valid ways to invoke the script:  
@@ -81,7 +81,7 @@ Prints this help message and exits.
 > [*Back to top*](#Table-of-contents)
 
 ## viewfetcher.py
-Retrieves daily pageview data for Signpost articles from the Wikimedia REST API.  
+Retrieves daily pageview data for Signpost articles from the Wikimedia REST API (which is input for combiner.py).
 ### Arguments  
 `year`  
 The start and end year to fetch views for. If not provided, defaults to the current year.

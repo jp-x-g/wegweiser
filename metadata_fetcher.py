@@ -180,6 +180,12 @@ def parse_hell(text, date, subpage):
   sh = dewhiten(str(datafields["subhead"]))
   ti = dewhiten(str(datafields["title"]))
 
+  # <!-- LEAVE BLANK to use "<title>: <blurb>" (using title and blurb from above), or replace with a custom description for the RSS feed -->
+  # This is the errorious string for when the subheading failed to get put in the template. Happens quite rarely.
+  if "or replace with a custom description for the RSS feed" in sh:
+    print("\nSUBHEAD CORRUPTED FOR: " + pagename)
+    errors += "\nSUBHEAD CORRUPTED FOR: " + pagename
+
   if (ti in sh):
     if (sh.find(ti) == 0):
       sh = sh.replace(ti + ": ", "")
@@ -398,6 +404,7 @@ if (__name__ == "__main__"):
     print("   fallback in case bugs prevent using the default parser.")
     print("-h, --help")
     print("   Prints this help message and exits. ")
+    exit()
 
 
 
