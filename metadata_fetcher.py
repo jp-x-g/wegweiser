@@ -131,12 +131,24 @@ def fetch(year_start=current_year, year_end=current_year, month_range=13, mode="
 def parse_hell(text, date, subpage):
   pagename = "Wikipedia:" + signpost + "/" + date + "/" + subpage
   datafields = {
-          "date"      : date,
-          "subpage"   : subpage,
-          "title"     : "unparsed",
-          "authors"   : ["unparsed"],
-          "subhead": ""          
+          "date"          : date,
+          "subpage"       : subpage,
+          "title"         : "unparsed",
+          "authors"       : ["unparsed"],
+          "subhead"       : "",
+          "piccy"         : {
+                            "filename": "",
+                            "credits" : "",
+                            "license" : "",
+                            "xoffset" : "",
+                            "yoffset" : "",
+                            "scaling" : ""
+                            }
           }
+  # We're prefilling "unparsed" for title and authors
+  # because those should never be blank (i.e. it's an error).
+  # But for the rest, there are many articles that simply don't
+  # have a subheading/picture/etc; it's fine for them to be blank.
 
   errors = ""
   w = mwparserfromhell.parse(text)
@@ -165,6 +177,21 @@ def parse_hell(text, date, subpage):
         errors += "\nTemplate:U for author: " + pagename
       # TODO: Write something to parse out all of the weird userlink templates:
       # {{u|asdf}}, {{U|asdf}}, {{ul|asdf}}, {{noping|asdf}}, {{np|asdf}}
+
+      hed = str(t.get("1").value)
+
+
+      # Parse piccy params.
+      try:
+        datafields["piccy"]["filename"] = dewhiten(str(t.get("piccyfilename").value))
+        datafields["piccy"]["credits"]  = dewhiten(str(t.get("piccy-credits").value))
+        datafields["piccy"]["license"]  = dewhiten(str(t.get("piccy-license").value))
+        datafields["piccy"]["xoffset"]  = dewhiten(str(t.get("piccy-xoffset").value))
+        datafields["piccy"]["yoffset"]  = dewhiten(str(t.get("piccy-yoffset").value))
+        datafields["piccy"]["scaling"]  = dewhiten(str(t.get("piccy-scaling").value))
+      except Exception as err:
+        pass
+        # No point in noting an error here, MOST articles lack piccys.
 
     elif str(t.name).strip() == "Wikipedia:Wikipedia Signpost/Templates/RSS description":
       #print("subhead = " + str(t.get("1").value))

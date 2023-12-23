@@ -42,6 +42,8 @@ table_key_priorities = {
     "authors": 3,
     "tags": 4,
     "views": 5,
+    "subhead": 6,
+    "piccy": 7
 }
 
 def compare_table_keys(a, b):
