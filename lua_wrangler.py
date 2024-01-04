@@ -23,27 +23,31 @@ def fetch(indexyear=2005, page=""):
 
   page_name = urllib.parse.quote(page_name, safe='')
   url = f"https://en.wikipedia.org/w/api.php?action=parse&page={page_name}&prop=wikitext&format=json&formatversion=2"
+  print(url)
   response = requests.get(url, headers=headers)
   if response.status_code == 200:
     print(f'Retrieved {url}')
     data = response.json()
     data = data["parse"]["wikitext"]
-    data_parsed = luadata.unserialize(data, encoding="utf-8", multival=False)
-    #luadata.unserialize(data, encoding="utf-8", multival=False, verbose=True)
-    return(data_parsed)
+    if data == "":
+        return("")
+    else:
+        data_parsed = luadata.unserialize(data, encoding="utf-8", multival=False)
+        #luadata.unserialize(data, encoding="utf-8", multival=False, verbose=True)
+        return(data_parsed)
   else:
     print(f'Error retrieving {url}')
     return(f"Error retrieving {indexyear}")
 
 table_key_priorities = {
-    "date": 0,
+    "date":    0,
     "subpage": 1,
-    "title": 2,
-    "authors": 3,
-    "tags": 4,
-    "views": 5,
-    "subhead": 6,
-    "piccy": 7
+    "title":   2,
+    "subhead": 3,
+    "authors": 4,
+    "piccy":   5,
+    "tags":    6,
+    "views":   7
 }
 
 def compare_table_keys(a, b):

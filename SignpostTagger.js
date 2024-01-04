@@ -222,9 +222,26 @@ currentPage.getAuthors = function () {
  // Can also use document.getElementsByClassName("signpost-rss-description")[0].innerHTML
 currentPage.getSubhead = function () {
 	try {
-			var subhed = $( '.signpost-rss-description' )[0].innerHTML;
-			// todo: check if the title is in here and strip it if so
-			return subhed;
+			var sh = $( '.signpost-rss-description' )[0].innerHTML;
+
+			// Strip out the heading from the RSS description text
+			// which is almost always formatted as
+			// "Heading: Subheading"
+			var ti = currentPage.getArticleTitle();
+
+			// Not EVERY instance of that string is the heading though.
+			// Especially if the heading is short, or a single word:
+			// we ONLY want to replace it if it appears right at the beginning.
+			if (sh.indexOf(ti) === 0) {
+				// almost always formatted as "Heading: Subheading"
+				// but can be other stuff: let's check for all of them
+				sh = sh.replace(ti + ": ", "");
+				sh = sh.replace(ti + ":", "");
+				sh = sh.replace(ti + " :", "");
+				sh = sh.replace(ti, "");
+			}
+
+			return sh;
 		} catch(error) {
 			console.log(error);
 			return "";
@@ -661,14 +678,14 @@ var LuaYearIndex = function ( options ) {
 OO.inheritClass( LuaYearIndex, LuaTitle );
 
 LuaYearIndex.static.sortKeys = {
-	date: 0,
+	date:    0,
 	subpage: 1,
-	title: 2,
-	authors: 3,
-	tags: 4,
-	views: 5,
-	subhead: 6,
-	piccy: 7
+	title:   2,
+	subhead: 3,
+	authors: 4,
+	piccy:   5,
+	tags:    6,
+	views:   7
 };
 
 /* Load and validate the index module data.
