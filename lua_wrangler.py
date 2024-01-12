@@ -51,6 +51,7 @@ table_key_priorities = {
 }
 
 
+
 def compare_table_keys(a, b):
     a_priority = table_key_priorities.get(a)
     b_priority = table_key_priorities.get(b)
