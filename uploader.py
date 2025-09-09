@@ -12,7 +12,7 @@ import article_fetcher
 import weg_ver
 
 
-def upload(source_file, page_name, summary=f"Wegweiser V{weg_ver.str()}"):
+def upload(source_file, page_name, summary=f"{weg_ver.summary()}"):
 	"""
 	Upload from a file.
 	"""
@@ -25,7 +25,7 @@ def upload(source_file, page_name, summary=f"Wegweiser V{weg_ver.str()}"):
 
 	upload_str(source, page_name, summary)
 
-def upload_str(source, page_name, summary=f"Wegweiser V{weg_ver.str()}"):
+def upload_str(source, page_name, summary=f"{weg_ver.summary()}"):
 	"""
 	Upload any string from Python.
 	"""
@@ -48,8 +48,10 @@ def upload_str(source, page_name, summary=f"Wegweiser V{weg_ver.str()}"):
 
 	s = requests.Session()
 
-	t = s.get(token_url)
+	t = s.get(token_url, headers=weg_ver.headers())
 	########## This line actually hits the API.
+	if (t.status_code != 200):
+		print(t.status_code, t.text)
 	token = json.loads(t.text)["query"]["tokens"]["logintoken"]
 	# Stores the result as "token"
 	#print("Token retrieved. Attempting login.")
@@ -63,6 +65,7 @@ def upload_str(source, page_name, summary=f"Wegweiser V{weg_ver.str()}"):
 			"lgtoken": token,
 			"format": "json",
 			},
+		headers=weg_ver.headers()
 		)
 	if l.status_code != 200:
 		print(f"Received status code from login request: {l.status_code}")
@@ -78,8 +81,10 @@ def upload_str(source, page_name, summary=f"Wegweiser V{weg_ver.str()}"):
 
 	########## Now we are logged in, and free to roam.
 
-	t = s.get(edit_token_url)
+	t = s.get(edit_token_url, headers=weg_ver.headers())
 	########## This line actually hits the API for an edit token.
+	if (t.status_code != 200):
+		print(t.status_code, t.text)
 	token = json.loads(t.text)["query"]["tokens"]["csrftoken"]
 
 	########## Okay, let's actually send the darn thing.
@@ -93,6 +98,7 @@ def upload_str(source, page_name, summary=f"Wegweiser V{weg_ver.str()}"):
 			"summary": f"{summary} / (Wegweiser V{weg_ver.str()})",
 			"format": "json",
 		},
+		headers=weg_ver.headers()
 	)
 	edit = edit.text
 	# print(edit)

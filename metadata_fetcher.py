@@ -143,7 +143,8 @@ def parse_hell(text, date, subpage):
                             "xoffset" : "",
                             "yoffset" : "",
                             "scaling" : ""
-                            }
+                            },
+          "meta": ["-1"]
           }
   # We're prefilling "unparsed" for title and authors
   # because those should never be blank (i.e. it's an error).
@@ -255,6 +256,7 @@ def clean_authors(authors, pagename="unspecified"):
       authors = authors[3:]
     # "Tom, Dick, and Harry"
     # "Tom, Dick and Harry"
+    authors = authors.replace(", &", ", ")
     authors = authors.replace(" & ", ", ")
     # Consider having a username without ampersands in it.
     authors = authors.replace(", and", ", ")
