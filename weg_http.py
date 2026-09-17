@@ -1,4 +1,4 @@
-# JPxG 2026 09 16
+# Claude 2026 09 16
 """
 One shared, polite, retrying HTTP session for all the Wegweiser scripts.
 
