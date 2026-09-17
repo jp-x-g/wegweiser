@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/jp-x-g/wegweiser/main/wegweiser-logo.jpg" alt="Wegweiser logo" width="400" height="400">
-</p>
-
 Various scripts to build and maintain Lua indices and article data for the Signpost.
 
 These scripts are made to be modular. The general architecture of the *Signpost*, which Wegweiser's operation is based on, has a few central principles:
