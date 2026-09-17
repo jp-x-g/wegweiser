@@ -8,6 +8,7 @@ import sys
 # python -m pip install --upgrade luadata
 import article_fetcher
 import weg_ver
+import weg_http
 headers = weg_ver.headers()
 
 # Normal usage looks like:
@@ -106,15 +107,16 @@ for year in all_articles:
     #print(article['subpage'])
     #print(f"Retrieving pageviews for {article['date']}/{article['subpage']}")
     print(url)
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-      # print(f'Retrieved {url}')
-      data = response.json()
-      pageviews = extract_views(data)
-      print(f"Retrieved pageviews for {article['date']}/{article['subpage']}: {pageviews}")
-      article["views"] = pageviews
-    else:
-      print(f"ERROR getting views for {article['date']}/{article['subpage']}")
+    # A 404 here is normal and expected: an article published in the last
+    # day or two has no pageview data yet. Anything else (429, 5xx) gets
+    # retried by weg_http, and raises if it keeps failing.
+    data = weg_http.get_json(url, tolerate=(404,))
+    if data is None:
+      print(f"No pageview data yet for {article['date']}/{article['subpage']}")
+      continue
+    pageviews = extract_views(data)
+    print(f"Retrieved pageviews for {article['date']}/{article['subpage']}: {pageviews}")
+    article["views"] = pageviews
       
 
 print(all_articles)

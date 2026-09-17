@@ -10,6 +10,7 @@ import sys
 import lua_wrangler
 import article_fetcher
 import weg_ver
+import weg_http
 
 
 # namespaces = {
@@ -52,22 +53,17 @@ def fetch(cat, complete=False):
   cat_list = []
   cat_name = urllib.parse.quote(cat, safe='') 
   url = f"https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:{cat_name}&cmlimit=500&format=json"
-  response = requests.get(url, headers=headers)
-  if response.status_code == 200:
-    print(f'Retrieved {url}')
-    data = response.json()
-    data = data["query"]["categorymembers"]
-    if complete == True:
-      return data
-    else:
-      for item in data:
-        # page_name = namespaces[str(item["ns"])] + str(item["title"])
-        # cat_list.append(page_name)
-        cat_list.append(str(item["title"]))
-      return(cat_list)
+  data = weg_http.get_json(url)
+  print(f'Retrieved {url}')
+  data = data["query"]["categorymembers"]
+  if complete == True:
+    return data
   else:
-    print(f'Error retrieving {url}')
-    return(f"Error retrieving {indexyear}")
+    for item in data:
+      # page_name = namespaces[str(item["ns"])] + str(item["title"])
+      # cat_list.append(page_name)
+      cat_list.append(str(item["title"]))
+    return(cat_list)
 
 
 if (__name__ == "__main__"):

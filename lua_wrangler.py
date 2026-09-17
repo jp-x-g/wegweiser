@@ -11,6 +11,7 @@ import luadata
 import lua_serializer
 
 import weg_ver
+import weg_http
 
 def fetch(indexyear=2005, page=""):
   headers = weg_ver.headers()
@@ -21,23 +22,27 @@ def fetch(indexyear=2005, page=""):
   else:
     page_name = page
 
+  pretty_name = page_name
   page_name = urllib.parse.quote(page_name, safe='')
   url = f"https://en.wikipedia.org/w/api.php?action=parse&page={page_name}&prop=wikitext&format=json&formatversion=2"
   print(url)
-  response = requests.get(url, headers=headers)
-  if response.status_code == 200:
-    print(f'Retrieved {url}')
-    data = response.json()
-    data = data["parse"]["wikitext"]
-    if data == "":
-        return("")
-    else:
-        data_parsed = luadata.unserialize(data, encoding="utf-8", multival=False)
-        #luadata.unserialize(data, encoding="utf-8", multival=False, verbose=True)
-        return(data_parsed)
-  else:
-    print(f'Error retrieving {url}')
-    return(f"Error retrieving {indexyear}")
+  data = weg_http.get_json(url)
+  print(f'Retrieved {url}')
+  if "error" in data:
+    # action=parse hands back a 200 with an error object for, e.g., a page
+    # that doesn't exist. Don't let that sail past as if it were a table.
+    raise weg_http.FetchError(
+      f'The API refused {pretty_name}: {data["error"].get("code")} -- {data["error"].get("info")}'
+    )
+  data = data["parse"]["wikitext"]
+  if data == "":
+    # An empty module is a legitimate (if boring) answer: no entries yet.
+    # Return an empty LIST, not an empty string -- callers iterate this and
+    # index into the items, and a string obliges them by yielding characters.
+    return([])
+  data_parsed = luadata.unserialize(data, encoding="utf-8", multival=False)
+  #luadata.unserialize(data, encoding="utf-8", multival=False, verbose=True)
+  return(data_parsed)
 
 table_key_priorities = {
     "date":    0,

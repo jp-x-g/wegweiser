@@ -10,6 +10,7 @@ import sys
 import lua_wrangler
 import article_fetcher
 import weg_ver
+import weg_http
 
 
 def upload(source_file, page_name, summary=f"{weg_ver.summary()}"):
@@ -46,13 +47,13 @@ def upload_str(source, page_name, summary=f"{weg_ver.summary()}"):
 	edit_token_url = api_base + "?action=query&meta=tokens&format=json"
 	# The token and login attempt must be part of the same session, or else it'll time out.
 
-	s = requests.Session()
+	s = weg_http.new_session()
+	# Its own session, because the login token and the login POST have to
+	# share cookies or the token goes stale on us.
 
-	t = s.get(token_url, headers=weg_ver.headers())
+	t = weg_http.get(token_url, sess=s)
 	########## This line actually hits the API.
-	if (t.status_code != 200):
-		print(t.status_code, t.text)
-	token = json.loads(t.text)["query"]["tokens"]["logintoken"]
+	token = weg_http.parse_json(t, token_url)["query"]["tokens"]["logintoken"]
 	# Stores the result as "token"
 	#print("Token retrieved. Attempting login.")
 	l = ""
@@ -72,7 +73,7 @@ def upload_str(source, page_name, summary=f"{weg_ver.summary()}"):
 		quit()
 	########## This line actually hits the API.
 	#print(l)
-	l = json.loads(l.text)
+	l = weg_http.parse_json(l, api_base)
 	if (l["login"]["result"]) != "Success":
 		print("!!! Login failed: " + str(l))
 		quit()
@@ -81,11 +82,9 @@ def upload_str(source, page_name, summary=f"{weg_ver.summary()}"):
 
 	########## Now we are logged in, and free to roam.
 
-	t = s.get(edit_token_url, headers=weg_ver.headers())
+	t = weg_http.get(edit_token_url, sess=s)
 	########## This line actually hits the API for an edit token.
-	if (t.status_code != 200):
-		print(t.status_code, t.text)
-	token = json.loads(t.text)["query"]["tokens"]["csrftoken"]
+	token = weg_http.parse_json(t, edit_token_url)["query"]["tokens"]["csrftoken"]
 
 	########## Okay, let's actually send the darn thing.
 	edit = s.post(
@@ -100,9 +99,8 @@ def upload_str(source, page_name, summary=f"{weg_ver.summary()}"):
 		},
 		headers=weg_ver.headers()
 	)
-	edit = edit.text
-	# print(edit)
-	edit = json.loads(edit)
+	# print(edit.text)
+	edit = weg_http.parse_json(edit, api_base)
 	print(edit)
 
 

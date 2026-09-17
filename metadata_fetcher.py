@@ -10,6 +10,7 @@ import mwparserfromhell
 import article_fetcher
 from bs4 import BeautifulSoup
 import weg_ver
+import weg_http
 headers = weg_ver.headers()
 # This is a secret tool that will come in handy later.
 signpost = "Wikipedia Signpost"
@@ -95,17 +96,14 @@ def fetch(year_start=current_year, year_end=current_year, month_range=13, mode="
 
     for url in queryurls:
       print(url)
-      response = requests.get(url, headers=headers)
-      if response.status_code != 200:
-        print(f"ERROR getting views for {article['date']}/{article['subpage']}")
-      else:
-        # Parse that shizzle.
-        bolus = json.loads(response.text)
-        # print(bolus)
-        for item in bolus["query"]["pages"]:
-          text = item["revisions"][0]["slots"]["main"]["content"]
-          title = item["title"]
-          article_stew[title] = text
+      # Parse that shizzle. (A failure here means a whole batch of articles
+      # goes missing from the stew, so weg_http raises rather than shrugging.)
+      bolus = weg_http.get_json(url)
+      # print(bolus)
+      for item in bolus["query"]["pages"]:
+        text = item["revisions"][0]["slots"]["main"]["content"]
+        title = item["title"]
+        article_stew[title] = text
     # So now we've gone through every single query URL, retrieved the page text, and put them into a huge pile of slop.
     # Now we can go through and pick out individual 
 
@@ -303,60 +301,57 @@ def obtain(article):
   url = f"https://en.wikipedia.org/wiki/{page_name}"
   #print(f"Retrieving pageviews for {article['date']}/{article['subpage']}")
   #print(url)
-  response = requests.get(url, headers=headers)
-  if response.status_code != 200:
-    print(f"ERROR getting views for {article['date']}/{article['subpage']}")
-  else:
-    # print(f'Retrieved {url}')
-    soup = BeautifulSoup(response.text, 'html.parser')
-    print(f"Retrieved {article['date']}/{article['subpage']} (length: {len(response.text)})")
-    ########################################
-    # Attempt to find the article title.
-    ########################################
-    titles = soup.find_all(id="signpost-article-title")
-    #print(titles)
-    for i in titles: 
-      try:
-        if i.has_attr("data-signpost-article-title"):
-          # 2017 to present (2023)
-          article["title"] = i["data-signpost-article-title"]
-          print(f"Title: {article['title']}")
-        else:
-          # February 2017 and before.
-          article["title"] = i.text
-          print(f"Title: {article['title']}")
-      except Exception as err:
-        print(f"Title error: {err}")
-        print(f"\nTitle error          : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}")
-        errors += f"\nTitle error          : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
-      if "\n" in article["title"]:
-        print(f"\nLine break in title  : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}")
-        errors += f"\nLine break in title  : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
-    ########################################
-    # Attempt to find the authors. Tricky!
-    ########################################
-    authors = soup.find_all(id="signpost-article-authors")
-    # Post-2017 author code.
-    #print(f"all authors: {authors}")
+  response = weg_http.get(url)
+  # print(f'Retrieved {url}')
+  soup = BeautifulSoup(response.text, 'html.parser')
+  print(f"Retrieved {article['date']}/{article['subpage']} (length: {len(response.text)})")
+  ########################################
+  # Attempt to find the article title.
+  ########################################
+  titles = soup.find_all(id="signpost-article-title")
+  #print(titles)
+  for i in titles: 
     try:
-      if len(authors) > 0:
-        authors = authors[0].text
+      if i.has_attr("data-signpost-article-title"):
+        # 2017 to present (2023)
+        article["title"] = i["data-signpost-article-title"]
+        print(f"Title: {article['title']}")
       else:
-        # For pre-2017-02-27 issues, where it was "signpost-author"
-        authors = soup.find_all(class_="signpost-author")
-        authors = authors[0].text
+        # February 2017 and before.
+        article["title"] = i.text
+        print(f"Title: {article['title']}")
     except Exception as err:
-      print(f"Author error         : {err}")
-      errors += f"\nAuthor error         : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
-      authors = "none"
-    if "\n" in authors:
-      errors += f"\nLine break in author : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
-  
-    cln = clean_authors(authors)
-    article["authors"] = cln[0]
-    errors += cln[1]
-    print(f"Authors: {str(cln[0])}")
-  
+      print(f"Title error: {err}")
+      print(f"\nTitle error          : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}")
+      errors += f"\nTitle error          : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
+    if "\n" in article["title"]:
+      print(f"\nLine break in title  : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}")
+      errors += f"\nLine break in title  : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
+  ########################################
+  # Attempt to find the authors. Tricky!
+  ########################################
+  authors = soup.find_all(id="signpost-article-authors")
+  # Post-2017 author code.
+  #print(f"all authors: {authors}")
+  try:
+    if len(authors) > 0:
+      authors = authors[0].text
+    else:
+      # For pre-2017-02-27 issues, where it was "signpost-author"
+      authors = soup.find_all(class_="signpost-author")
+      authors = authors[0].text
+  except Exception as err:
+    print(f"Author error         : {err}")
+    errors += f"\nAuthor error         : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
+    authors = "none"
+  if "\n" in authors:
+    errors += f"\nLine break in author : Wikipedia:Wikipedia Signpost/{article['date']}/{article['subpage']}"
+
+  cln = clean_authors(authors)
+  article["authors"] = cln[0]
+  errors += cln[1]
+  print(f"Authors: {str(cln[0])}")
+
   return(article, errors)
   
 

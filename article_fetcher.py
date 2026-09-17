@@ -6,6 +6,7 @@ import urllib
 import luadata
 import sys
 import weg_ver
+import weg_http
 # python -m pip install --upgrade luadata
 
 # This is a secret tool that will come in handy later.
@@ -33,15 +34,13 @@ def fetch(year_start=int(datetime.datetime.now().year), year_end=int(datetime.da
 
   # Now we hit the API to populate the articles_array.
   for url in page_list_array:
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-      print(f'Retrieved {url}')
-      data = response.json()
-      for item in data["query"]["allpages"]:
-        # print(item["title"])
-        articles_array.append(item["title"])
-    else:
-      print(f'Error retrieving {url}')
+    # If this can't be retrieved we have a hole in the article list, which
+    # quietly becomes missing entries in the index. Better to stop and say so.
+    data = weg_http.get_json(url)
+    print(f'Retrieved {url}')
+    for item in data["query"]["allpages"]:
+      # print(item["title"])
+      articles_array.append(item["title"])
 
   #print(articles_array)
   

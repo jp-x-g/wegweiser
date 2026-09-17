@@ -6,6 +6,7 @@ import urllib
 import luadata
 import sys
 import weg_ver
+import weg_http
 from datetime import datetime
 # python -m pip install --upgrade luadata
 
@@ -47,15 +48,13 @@ def fetch(year_start=2005, year_end=2001, format="dict"):
 
   # Now we hit the API to populate the articles_array.
   for url in issue_list_array:
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-      print(f'Retrieved {url}')
-      data = response.json()
-      for item in data["query"]["allpages"]:
-        # print(item["title"])
-        issues_array.append(item["title"].replace(pref, ""))
-    else:
-      print(f'Error retrieving {url}')
+    # Same deal as article_fetcher: a dropped request here silently eats
+    # a whole year of issues, so let it raise instead.
+    data = weg_http.get_json(url)
+    print(f'Retrieved {url}')
+    for item in data["query"]["allpages"]:
+      # print(item["title"])
+      issues_array.append(item["title"].replace(pref, ""))
 
   #print(articles_array)
 
